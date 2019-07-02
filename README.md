@@ -5,8 +5,14 @@
 [![Join the chat at https://slack.fuzzit.dev](https://app.fuzzit.dev/static/slack-join.svg)](https://slack.fuzzit.dev)
 
 ## Fuzzit
-Fuzzit helps you integrate Continuous Fuzzing to your current CI/CD workflow
+[Fuzzit](https://fuzzit.dev) helps you integrate Continuous Fuzzing to your current CI/CD workflow
 
+## Download
+
+You can download the precompiled release binary from [releases](https://github.com/fuzzitdev/fuzzit/releases) via web
+or via
+
+`wget https://github.com/fuzzitdev/fuzzit/releases/download/<version>/fuzzit_<version>_<os>_<arch>`
 
 ## Compilation
 
@@ -20,7 +26,7 @@ go build ./...
 
 Fuzzit CLI can be used either locally or from your CI.
 
-Run `snyk --help` to get a full list of commands or checkout our [docs](https://docs.fuzzit.dev).
+Run `fuzzit --help` to get a full list of commands or checkout our [docs](https://docs.fuzzit.dev).
 
 ## Versioning
 
