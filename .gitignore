@@ -15,3 +15,6 @@ fuzzit
 
 # Goland
 .idea
+
+# Goreleases
+dist/

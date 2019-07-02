@@ -1,6 +1,5 @@
 package main
 
-import "C"
 import (
 	"encoding/json"
 	"gopkg.in/urfave/cli.v1"
@@ -50,7 +49,7 @@ func main() {
 	app.EnableBashCompletion = true
 	app.Name = "Fuzzit"
 	app.Usage = "Continuous fuzzing made simple"
-	app.Version = "1.2.1"
+	app.Version = "1.2.2"
 	app.Compiled = time.Now()
 	app.Authors = []cli.Author{
 		cli.Author{
