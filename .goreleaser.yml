@@ -11,6 +11,10 @@ builds:
   - CGO_ENABLED=0
   - GO111MODULE=on
   main: ./cmd/fuzzit
+  goos:
+    - windows
+    - linux
+    - darwin
 archives:
 - replacements:
     darwin: Darwin
@@ -18,10 +22,6 @@ archives:
     windows: Windows
     386: i386
     amd64: x86_64
-goos:
-  - windows
-  - linux
-  - darwin
 checksum:
   name_template: 'checksums.txt'
 snapshot:
