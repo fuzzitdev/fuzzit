@@ -20,7 +20,12 @@ go build ./...
 
 Fuzzit CLI can be used either locally or from your CI.
 
-Run `snyk --help` to get a full list of commands or checkout our [docs](https://docs.fuzzit.dev). 
+Run `snyk --help` to get a full list of commands or checkout our [docs](https://docs.fuzzit.dev).
+
+## Versioning
+
+Fuzzit CLI Version contains three components x.y.z . an increase in `z` ensures backward comparability while increase
+in `y` might introduce breaking changes.  
 
 ## Reporting Security Vulnerabilities
 

@@ -50,7 +50,7 @@ func main() {
 	app.EnableBashCompletion = true
 	app.Name = "Fuzzit"
 	app.Usage = "Continuous fuzzing made simple"
-	app.Version = "1.2"
+	app.Version = "1.2.1"
 	app.Compiled = time.Now()
 	app.Authors = []cli.Author{
 		cli.Author{
