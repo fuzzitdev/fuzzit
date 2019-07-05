@@ -28,6 +28,13 @@ Fuzzit CLI can be used either locally or from your CI.
 
 Run `fuzzit --help` to get a full list of commands or checkout our [docs](https://docs.fuzzit.dev).
 
+## Contribution
+
+Contributions are welcome. If you need additional feature either open a github issue or a PR
+if you like to contribute it. Before contributing a big feature please open an issue so we can discuss and 
+approve before a lot of code is written. For bugfixes also open an issue or PR.
+
+
 ## Versioning
 
 Fuzzit CLI Version contains three components x.y.z . an increase in `z` ensures backward comparability while increase

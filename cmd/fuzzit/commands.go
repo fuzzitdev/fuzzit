@@ -82,7 +82,7 @@ func copy(src, dst string) (int64, error) {
 
 func loadFromFile(configFile string) (*FuzzitCli, error) {
 	if _, err := os.Stat(configFile); os.IsNotExist(err) {
-		return nil, fmt.Errorf("please run fuzzit auth <api_key> <org_id>")
+		return nil, fmt.Errorf("please run fuzzit auth <api_key>")
 	}
 
 	file, err := os.Open(configFile)
