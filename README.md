@@ -7,6 +7,8 @@
 ## Fuzzit
 [Fuzzit](https://fuzzit.dev) helps you integrate Continuous Fuzzing to your current CI/CD workflow
 
+[![Fuzzit Introduction](https://img.youtube.com/vi/Va7rfTTPiNo/maxresdefault.jpg)](https://www.youtube.com/watch?v=Va7rfTTPiNo)
+
 ## Download
 
 You can download the precompiled release binary from [releases](https://github.com/fuzzitdev/fuzzit/releases) via web
