@@ -55,7 +55,7 @@ type FuzzitCli struct {
 	httpClient *http.Client `json:"-"`
 }
 
-func copy(src, dst string) (int64, error) {
+func copyFile(src, dst string) (int64, error) {
 	sourceFileStat, err := os.Stat(src)
 	if err != nil {
 		return 0, err
@@ -260,7 +260,7 @@ func (c * FuzzitCli) createJob(targetId string, jobType string, host string,
 		if err != nil {
 			return nil, err
 		}
-		_, err = copy(fuzzerPath, tmpDir+"/fuzzer")
+		_, err = copyFile(fuzzerPath, tmpDir+"/fuzzer")
 		if err != nil {
 			return nil, err
 		}

@@ -10,6 +10,11 @@ import (
 	"time"
 )
 
+
+type storageLinkResponse struct {
+	StorageLink string `json:"storage_link"`
+}
+
 var httpClient = &http.Client{Timeout: 120 * time.Second}
 
 func getStorageLink(storagePath string, apiKey string) (string, error) {

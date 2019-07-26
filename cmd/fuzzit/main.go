@@ -14,9 +14,6 @@ import "fmt"
 var fuzzitCli *FuzzitCli
 
 
-type storageLinkResponse struct {
-	StorageLink string `json:"storage_link"`
-}
 
 
 func loadConfig(c * cli.Context) error {
