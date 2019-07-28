@@ -33,3 +33,5 @@ changelog:
     exclude:
     - '^docs:'
     - '^test:'
+release:
+  name_template: "{{.ProjectName}}_{{Os}}_{{Arch}}"
