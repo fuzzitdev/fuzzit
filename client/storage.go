@@ -1,4 +1,4 @@
-package main
+package client
 
 import (
 	"encoding/json"
@@ -12,8 +12,12 @@ import (
 
 var httpClient = &http.Client{Timeout: 120 * time.Second}
 
-func getStorageLink(storagePath string, apiKey string) (string, error) {
-	r, err := httpClient.Get(fmt.Sprintf("https://app.fuzzit.dev/getStorageLink?path=%s&api_key=%s", storagePath, apiKey))
+type storageLinkResponse struct {
+	StorageLink string `json:"storage_link"`
+}
+
+func (c * fuzzitClient) getStorageLink(storagePath string) (string, error) {
+	r, err := httpClient.Get(fmt.Sprintf("https://app.fuzzit.dev/getStorageLink?path=%s&api_key=%s", storagePath, c.ApiKey))
 	if err != nil {
 		return "", err
 	}
@@ -31,14 +35,14 @@ func getStorageLink(storagePath string, apiKey string) (string, error) {
 	return res.StorageLink, nil
 }
 
-func uploadFile(filePath string, storagePath string, apiKey string, contentType string, filename string) error {
+func (c * fuzzitClient) uploadFile(filePath string, storagePath string, contentType string, filename string) error {
 	data, err := os.Open(filePath)
 	if err != nil {
 		return err
 	}
 	defer data.Close()
 
-	storageLink, err := getStorageLink(storagePath, apiKey)
+	storageLink, err := c.getStorageLink(storagePath)
 	if err != nil {
 		return err
 	}

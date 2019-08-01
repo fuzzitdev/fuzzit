@@ -6,7 +6,7 @@ builds:
 - env:
   - CGO_ENABLED=0
   - GO111MODULE=on
-  main: ./cmd/fuzzit
+  main: ./main.go
   goos:
     - windows
     - linux

@@ -25,7 +25,7 @@ Also, you can use the following command to download and compile (This usually ta
 ```bash
 git clone git@github.com:fuzzitdev/fuzzit.git
 cd fuzzit
-go build ./...
+go build .
 ```
 
 ## Usage
@@ -33,6 +33,15 @@ go build ./...
 Fuzzit CLI can be used either locally or from your CI.
 
 Run `fuzzit --help` to get a full list of commands or checkout our [docs](https://docs.fuzzit.dev).
+
+## Examples
+
+Fuzzit currently supports C/C++ and Go
+
+* [C/C++ examples](https://github.com/fuzzitdev/example-c)
+* [Go examples](https://github.com/fuzzitdev/example-go)
+
+More information can be at our [docs](https://docs.fuzzit.dev) 
 
 ## Contribution
 
