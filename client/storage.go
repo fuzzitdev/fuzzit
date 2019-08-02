@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -18,15 +19,18 @@ type storageLinkResponse struct {
 	StorageLink string `json:"storage_link"`
 }
 
-func (c *fuzzitClient) getStorageLink(storagePath string) (string, error) {
-	uri := fmt.Sprintf("https://app.fuzzit.dev/getStorageLink?path=%s&api_key=%s", url.QueryEscape(storagePath), url.QueryEscape(c.ApiKey))
+func (c *fuzzitClient) getStorageLink(storagePath string, action string) (string, error) {
+	uri := fmt.Sprintf("https://app.fuzzit.dev/getStorageLinkV3?path=%s&api_key=%s&action=%s",
+		url.QueryEscape(storagePath),
+		url.QueryEscape(c.ApiKey),
+		action)
 	r, err := httpClient.Get(uri)
 	if err != nil {
 		return "", err
 	}
 	defer r.Body.Close()
 	if r.StatusCode != 200 {
-		return "", fmt.Errorf("API Key is not valid")
+		return "", errors.New(r.Status)
 	}
 
 	var res storageLinkResponse
@@ -45,7 +49,7 @@ func (c *fuzzitClient) uploadFile(filePath string, storagePath string, contentTy
 	}
 	defer data.Close()
 
-	storageLink, err := c.getStorageLink(storagePath)
+	storageLink, err := c.getStorageLink(storagePath, "write")
 	if err != nil {
 		return err
 	}
@@ -67,5 +71,34 @@ func (c *fuzzitClient) uploadFile(filePath string, storagePath string, contentTy
 		}
 		return errors.New(string(bodyBytes))
 	}
+	return nil
+}
+
+func (c *fuzzitClient) downloadFile(filePath string, storagePath string) error {
+	storageLink, err := c.getStorageLink(storagePath, "read")
+	if err != nil {
+		return err
+	}
+
+	out, err := os.Create(filePath)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
+	resp, err := http.Get(storageLink)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		return errors.New(resp.Status)
+	}
+
+	_, err = io.Copy(out, resp.Body)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

@@ -2,7 +2,12 @@ package client
 
 import (
 	"cloud.google.com/go/firestore"
+	"encoding/json"
+	"log"
 	"net/http"
+	"os"
+	"os/user"
+	"path"
 	"time"
 )
 
@@ -15,6 +20,7 @@ type Target struct {
 type Job struct {
 	TargetId     string `firestore:"target_id"`
 	Args         string `firestore:"args"`
+	Local        bool
 	Type         string `firestore:"type"`
 	Host         string `firestore:"host"`
 	Revision     string `firestore:"revision"`
@@ -49,21 +55,48 @@ type fuzzitClient struct {
 	httpClient      *http.Client
 }
 
-func NewFuzzitClient(apiKey string) *fuzzitClient {
+func NewFuzzitClient(apiKey string) (*fuzzitClient, error) {
 	c := &fuzzitClient{}
 	c.httpClient = &http.Client{Timeout: 60 * time.Second}
 	c.ApiKey = apiKey
-
-	return c
+	err := c.refreshToken()
+	if err != nil {
+		return nil, err
+	}
+	return c, nil
 }
 
 func LoadFuzzitFromCache() (*fuzzitClient, error) {
 	c := &fuzzitClient{}
 	c.httpClient = &http.Client{Timeout: 60 * time.Second}
-	err := c.ReAuthenticate(false)
+
+	usr, err := user.Current()
+	if err != nil {
+		log.Fatal(err)
+	}
+	cacheFile := path.Join(usr.HomeDir, ".fuzzit.cache")
+
+	if _, err := os.Stat(cacheFile); os.IsNotExist(err) {
+		return c, nil
+	}
+
+	file, err := os.Open(cacheFile)
 	if err != nil {
 		return nil, err
 	}
+
+	err = json.NewDecoder(file).Decode(c)
+	file.Close()
+	if err != nil {
+		// try to prevent being stuck forever if cache file gets corrupted
+		os.Remove(cacheFile)    // if a file
+		os.RemoveAll(cacheFile) // if a directory
+		return nil, err
+	}
+
+	//if c.ApiKey == "" {
+	//	return errors.New("API Key is not configured (will have access only to public repositories)")
+	//}
 
 	return c, nil
 }

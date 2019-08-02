@@ -29,8 +29,7 @@ var authCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		log.Println("Authenticating with fuzzit...")
-		c := client.NewFuzzitClient(args[0])
-		err := c.ReAuthenticate(true)
+		_, err := client.NewFuzzitClient(args[0])
 		if err != nil {
 			log.Fatal(err)
 		}

@@ -25,7 +25,7 @@ import (
 var getCmd = &cobra.Command{
 	Use:   "get <resource_path>",
 	Short: "get information about targets or jobs",
-	Long: `Example: 
+	Example: `
 	./fuzzit get targets # retrieve all targets
 	./fuzzit get targets/<target_id> # retrieve specific target
 	./fuzzit get targets/<target_id>/jobs # retrieve all jobs for target
