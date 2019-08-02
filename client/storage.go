@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"time"
 )
@@ -17,7 +18,8 @@ type storageLinkResponse struct {
 }
 
 func (c *fuzzitClient) getStorageLink(storagePath string) (string, error) {
-	r, err := httpClient.Get(fmt.Sprintf("https://app.fuzzit.dev/getStorageLink?path=%s&api_key=%s", storagePath, c.ApiKey))
+	uri := fmt.Sprintf("https://app.fuzzit.dev/getStorageLink?path=%s&api_key=%s", url.QueryEscape(storagePath), url.QueryEscape(c.ApiKey))
+	r, err := httpClient.Get(uri)
 	if err != nil {
 		return "", err
 	}

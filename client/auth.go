@@ -2,19 +2,21 @@ package client
 
 import (
 	"bytes"
-	"cloud.google.com/go/firestore"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"golang.org/x/oauth2"
-	"google.golang.org/api/option"
 	"io/ioutil"
 	"log"
+	"net/url"
 	"os"
 	"os/user"
 	"path"
 	"time"
+
+	"cloud.google.com/go/firestore"
+	"golang.org/x/oauth2"
+	"google.golang.org/api/option"
 )
 
 func (c *fuzzitClient) ReAuthenticate(force bool) error {
@@ -42,7 +44,7 @@ func (c *fuzzitClient) ReAuthenticate(force bool) error {
 	}
 
 	if c.IdToken == "" || (time.Now().Unix()-c.LastRefresh) > 60*45 {
-		createCustomTokenEndpoint := fmt.Sprintf("%s/createCustomToken?api_key=%s", FuzzitEndpoint, c.ApiKey)
+		createCustomTokenEndpoint := fmt.Sprintf("%s/createCustomToken?api_key=%s", FuzzitEndpoint, url.QueryEscape(c.ApiKey))
 		r, err := c.httpClient.Get(createCustomTokenEndpoint)
 		if err != nil {
 			return err
