@@ -10,11 +10,20 @@ import (
 	"golang.org/x/oauth2"
 	"google.golang.org/api/option"
 	"io/ioutil"
+	"log"
 	"os"
+	"os/user"
+	"path"
 	"time"
 )
 
-func (c * fuzzitClient) ReAuthenticate(force bool) error {
+func (c *fuzzitClient) ReAuthenticate(force bool) error {
+	usr, err := user.Current()
+	if err != nil {
+		log.Fatal(err)
+	}
+	CacheFile := path.Join(usr.HomeDir, ".fuzzit.cache")
+
 	if !force {
 		file, err := os.Open(CacheFile)
 		if err != nil {
@@ -32,7 +41,7 @@ func (c * fuzzitClient) ReAuthenticate(force bool) error {
 		return errors.New("API Key is no configured, please run fuzzit auth [api_key]")
 	}
 
-	if c.IdToken == "" || (time.Now().Unix() - c.LastRefresh) > 60*45 {
+	if c.IdToken == "" || (time.Now().Unix()-c.LastRefresh) > 60*45 {
 		createCustomTokenEndpoint := fmt.Sprintf("%s/createCustomToken?api_key=%s", FuzzitEndpoint, c.ApiKey)
 		r, err := c.httpClient.Get(createCustomTokenEndpoint)
 		if err != nil {
@@ -74,10 +83,10 @@ func (c * fuzzitClient) ReAuthenticate(force bool) error {
 	}
 
 	token := oauth2.Token{
-		AccessToken: c.IdToken,
+		AccessToken:  c.IdToken,
 		RefreshToken: c.RefreshToken,
-		Expiry: time.Time{},
-		TokenType: "Bearer",
+		Expiry:       time.Time{},
+		TokenType:    "Bearer",
 	}
 
 	tokenSource := oauth2.StaticTokenSource(&token)

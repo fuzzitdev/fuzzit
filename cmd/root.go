@@ -16,36 +16,32 @@ limitations under the License.
 package cmd
 
 import (
-  "fmt"
-  "github.com/spf13/cobra"
-  "os"
+	"fmt"
+	"github.com/spf13/cobra"
+	"os"
 )
-
 
 var cfgFile string
 
-
 var rootCmd = &cobra.Command{
-  Use:   "Fuzzit",
-  Short: "Continuous fuzzing made simple CLI",
-  Version: "2.0.0",
+	Use:     "Fuzzit",
+	Short:   "Continuous fuzzing made simple CLI",
+	Version: "2.1.0",
 }
 
 func Execute() {
-  if err := rootCmd.Execute(); err != nil {
-    fmt.Println(err)
-    os.Exit(1)
-  }
+	if err := rootCmd.Execute(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 }
 
 func init() {
-  cobra.OnInitialize(initConfig)
+	cobra.OnInitialize(initConfig)
 
 }
-
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
 
 }
-

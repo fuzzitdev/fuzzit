@@ -5,6 +5,7 @@ import (
 	"cloud.google.com/go/firestore"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/mholt/archiver"
@@ -16,7 +17,7 @@ import (
 	"strings"
 )
 
-func (c * fuzzitClient) GetResource(resource string) error {
+func (c *fuzzitClient) GetResource(resource string) error {
 	err := c.ReAuthenticate(false)
 	if err != nil {
 		return err
@@ -73,7 +74,7 @@ func (c * fuzzitClient) GetResource(resource string) error {
 	}
 }
 
-func (c * fuzzitClient) CreateTarget(targetConfig Target, seedPath string) (*firestore.DocumentRef, error) {
+func (c *fuzzitClient) CreateTarget(targetConfig Target, seedPath string) (*firestore.DocumentRef, error) {
 	ctx := context.Background()
 	collectionRef := c.firestoreClient.Collection("orgs/" + c.Org + "/targets")
 	doc, _, err := collectionRef.Add(ctx,
@@ -92,8 +93,15 @@ func (c * fuzzitClient) CreateTarget(targetConfig Target, seedPath string) (*fir
 	return doc, nil
 }
 
-func (c * fuzzitClient) CreateJob(jobConfig Job, files [] string) (*firestore.DocumentRef, error) {
+func (c *fuzzitClient) CreateJob(jobConfig Job, files []string) (*firestore.DocumentRef, error) {
 	ctx := context.Background()
+
+	for _, filename := range files {
+		if _, err := os.Stat(filename); os.IsNotExist(err) {
+			return nil, errors.New(fmt.Sprintf("File %s doesnt exist...", filename))
+		}
+	}
+
 	collectionRef := c.firestoreClient.Collection("orgs/" + c.Org + "/targets/" + jobConfig.TargetId + "/jobs")
 	fullJob := job{}
 	fullJob.Job = jobConfig
@@ -110,13 +118,13 @@ func (c * fuzzitClient) CreateJob(jobConfig Job, files [] string) (*firestore.Do
 
 	fuzzerPath := files[0]
 	splits := strings.Split(fuzzerPath, "/")
-	filename := splits[len(splits) - 1]
+	filename := splits[len(splits)-1]
 	if !strings.HasSuffix(filename, ".tar.gz") {
 		tmpDir, err := ioutil.TempDir("", "fuzzit")
 		if err != nil {
 			return nil, err
 		}
-		_, err = copyFile(fuzzerPath, tmpDir+"/fuzzer")
+		_, err = copyFile(tmpDir+"/fuzzer", fuzzerPath)
 		if err != nil {
 			return nil, err
 		}
@@ -149,7 +157,7 @@ func (c * fuzzitClient) CreateJob(jobConfig Job, files [] string) (*firestore.Do
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("Authorization", "Bearer " + c.IdToken)
+	req.Header.Set("Authorization", "Bearer "+c.IdToken)
 	req.Header.Set("Content-Type", "application/json")
 
 	res, err := httpClient.Do(req)
@@ -169,4 +177,3 @@ func (c * fuzzitClient) CreateJob(jobConfig Job, files [] string) (*firestore.Do
 	defer res.Body.Close()
 	return doc, nil
 }
-

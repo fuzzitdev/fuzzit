@@ -17,16 +17,15 @@ package cmd
 
 import (
 	"github.com/fuzzitdev/fuzzit/client"
-	"log"
-
 	"github.com/spf13/cobra"
+	"log"
 )
 
 // targetCmd represents the target command
 var targetCmd = &cobra.Command{
 	Use:   "target [target_name]",
 	Short: "Create new fuzzing target",
-	Args: cobra.ExactArgs(1),
+	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		log.Println("Creating target...")
 		c, err := client.LoadFuzzitFromCache()

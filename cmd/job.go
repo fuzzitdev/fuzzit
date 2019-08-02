@@ -29,8 +29,12 @@ var newJob = client.Job{}
 var jobCmd = &cobra.Command{
 	Use:   "job [target_id] [files...]",
 	Short: "create new fuzzing job",
-	Args: cobra.MinimumNArgs(2),
+	Args:  cobra.MinimumNArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
+		if newJob.Type != "fuzzing" && newJob.Type != "sanity" {
+			log.Fatalf("--type should be either fuzzing or sanity. Recieved: %s", newJob.Type)
+		}
+
 		log.Println("Creating job...")
 		c, err := client.LoadFuzzitFromCache()
 		if err != nil {

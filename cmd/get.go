@@ -17,9 +17,8 @@ package cmd
 
 import (
 	"github.com/fuzzitdev/fuzzit/client"
-	"log"
-
 	"github.com/spf13/cobra"
+	"log"
 )
 
 // getCmd represents the get command

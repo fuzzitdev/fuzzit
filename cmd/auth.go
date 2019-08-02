@@ -22,12 +22,11 @@ import (
 	"log"
 )
 
-
 // authCmd represents the auth command
 var authCmd = &cobra.Command{
 	Use:   "auth [api_key]",
 	Short: "Authenticate with fuzzit servers",
-	Args: cobra.ExactArgs(1),
+	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		log.Println("Authenticating with fuzzit...")
 		c := client.NewFuzzitClient(args[0])

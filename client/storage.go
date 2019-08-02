@@ -16,7 +16,7 @@ type storageLinkResponse struct {
 	StorageLink string `json:"storage_link"`
 }
 
-func (c * fuzzitClient) getStorageLink(storagePath string) (string, error) {
+func (c *fuzzitClient) getStorageLink(storagePath string) (string, error) {
 	r, err := httpClient.Get(fmt.Sprintf("https://app.fuzzit.dev/getStorageLink?path=%s&api_key=%s", storagePath, c.ApiKey))
 	if err != nil {
 		return "", err
@@ -35,7 +35,7 @@ func (c * fuzzitClient) getStorageLink(storagePath string) (string, error) {
 	return res.StorageLink, nil
 }
 
-func (c * fuzzitClient) uploadFile(filePath string, storagePath string, contentType string, filename string) error {
+func (c *fuzzitClient) uploadFile(filePath string, storagePath string, contentType string, filename string) error {
 	data, err := os.Open(filePath)
 	if err != nil {
 		return err
@@ -52,7 +52,7 @@ func (c * fuzzitClient) uploadFile(filePath string, storagePath string, contentT
 	if err != nil {
 		return err
 	}
-	req.Header.Set("Content-Disposition", "attachment; filename=" + filename)
+	req.Header.Set("Content-Disposition", "attachment; filename="+filename)
 	res, err := httpClient.Do(req)
 	if err != nil {
 		return err
