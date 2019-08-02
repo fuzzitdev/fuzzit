@@ -2,19 +2,21 @@ package client
 
 import (
 	"bytes"
-	"cloud.google.com/go/firestore"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/google/uuid"
-	"github.com/mholt/archiver"
-	"google.golang.org/api/iterator"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
+
+	"cloud.google.com/go/firestore"
+	"github.com/google/uuid"
+	"github.com/mholt/archiver"
+	"google.golang.org/api/iterator"
 )
 
 func (c *fuzzitClient) GetResource(resource string) error {
@@ -25,18 +27,18 @@ func (c *fuzzitClient) GetResource(resource string) error {
 
 	ctx := context.Background()
 	rootColRef := "orgs/" + c.Org + "/"
+	r := rootColRef + resource
 	if (len(strings.Split(resource, "/")) % 2) == 0 {
-		r := rootColRef + resource
-		docRef := c.firestoreClient.Doc(rootColRef + resource)
+		docRef := c.firestoreClient.Doc(r)
 		if docRef == nil {
 			return fmt.Errorf("invalid resource %s", r)
 		}
 		docsnap, err := docRef.Get(ctx)
-		if !docsnap.Exists() {
-			return fmt.Errorf("resource %s doesn't exist", resource)
-		}
 		if err != nil {
 			return err
+		}
+		if !docsnap.Exists() {
+			return fmt.Errorf("resource %s doesn't exist", resource)
 		}
 
 		jsonString, err := json.MarshalIndent(docsnap.Data(), "", " ")
@@ -46,7 +48,7 @@ func (c *fuzzitClient) GetResource(resource string) error {
 		fmt.Println(string(jsonString))
 		return nil
 	} else {
-		iter := c.firestoreClient.Collection(rootColRef + resource).Documents(ctx)
+		iter := c.firestoreClient.Collection(r).Documents(ctx)
 		querySize := 0
 		defer iter.Stop()
 
@@ -77,8 +79,7 @@ func (c *fuzzitClient) GetResource(resource string) error {
 func (c *fuzzitClient) CreateTarget(targetConfig Target, seedPath string) (*firestore.DocumentRef, error) {
 	ctx := context.Background()
 	collectionRef := c.firestoreClient.Collection("orgs/" + c.Org + "/targets")
-	doc, _, err := collectionRef.Add(ctx,
-		targetConfig)
+	doc, _, err := collectionRef.Add(ctx, targetConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -97,8 +98,8 @@ func (c *fuzzitClient) CreateJob(jobConfig Job, files []string) (*firestore.Docu
 	ctx := context.Background()
 
 	for _, filename := range files {
-		if _, err := os.Stat(filename); os.IsNotExist(err) {
-			return nil, errors.New(fmt.Sprintf("File %s doesnt exist...", filename))
+		if st, err := os.Stat(filename); err != nil || !st.Mode().IsRegular() {
+			return nil, errors.New(fmt.Sprintf("File %s doesn't exist...", filename))
 		}
 	}
 
@@ -109,22 +110,21 @@ func (c *fuzzitClient) CreateJob(jobConfig Job, files []string) (*firestore.Docu
 	fullJob.OrgId = c.Org
 	fullJob.Namespace = c.Namespace
 	fullJob.Status = "in progress"
-	doc, _, err := collectionRef.Add(ctx,
-		fullJob)
+	doc, _, err := collectionRef.Add(ctx, fullJob)
 	if err != nil {
 		return nil, err
 	}
 	log.Println("Created new job ", doc.ID)
 
 	fuzzerPath := files[0]
-	splits := strings.Split(fuzzerPath, "/")
-	filename := splits[len(splits)-1]
+	filename := filepath.Base(fuzzerPath)
 	if !strings.HasSuffix(filename, ".tar.gz") {
 		tmpDir, err := ioutil.TempDir("", "fuzzit")
 		if err != nil {
 			return nil, err
 		}
-		_, err = copyFile(tmpDir+"/fuzzer", fuzzerPath)
+		dstPath := filepath.Join(tmpDir, "fuzzer")
+		_, err = copyFile(dstPath, fuzzerPath)
 		if err != nil {
 			return nil, err
 		}
@@ -133,9 +133,9 @@ func (c *fuzzitClient) CreateJob(jobConfig Job, files []string) (*firestore.Docu
 		if err != nil {
 			return nil, err
 		}
-		filesToArchive := append([]string{tmpDir + "/fuzzer"}, files[1:]...)
+		filesToArchive := append([]string{dstPath}, files[1:]...)
 
-		tmpfile := os.TempDir() + "/" + prefix.String() + ".tar.gz"
+		tmpfile := filepath.Join(os.TempDir(), prefix.String()+".tar.gz")
 		z := archiver.NewTarGz()
 		err = z.Archive(filesToArchive, tmpfile)
 		if err != nil {
@@ -150,10 +150,10 @@ func (c *fuzzitClient) CreateJob(jobConfig Job, files []string) (*firestore.Docu
 		return nil, err
 	}
 
-	jsonStr := []byte(fmt.Sprintf(`{"data": {"org_id": "%s", "target_id": "%s", "job_id": "%s"}}`, c.Org, jobConfig.TargetId, doc.ID))
+	jsonStr := fmt.Sprintf(`{"data": {"org_id": "%s", "target_id": "%s", "job_id": "%s"}}`, c.Org, jobConfig.TargetId, doc.ID)
 	req, err := http.NewRequest("POST",
 		"https://us-central1-fuzzit-b5fbf.cloudfunctions.net/startJob",
-		bytes.NewBuffer(jsonStr))
+		bytes.NewBufferString(jsonStr))
 	if err != nil {
 		return nil, err
 	}
@@ -164,16 +164,14 @@ func (c *fuzzitClient) CreateJob(jobConfig Job, files []string) (*firestore.Docu
 	if err != nil {
 		return nil, err
 	}
+	defer res.Body.Close()
 	if res.StatusCode != http.StatusOK {
 		bodyBytes, err := ioutil.ReadAll(res.Body)
 		if err != nil {
 			log.Fatal(err)
 		}
-		bodyString := string(bodyBytes)
-		defer res.Body.Close()
-		return nil, fmt.Errorf(bodyString)
+		return nil, errors.New(string(bodyBytes))
 	}
 	fmt.Printf("Job %s started succesfully\n", doc.ID)
-	defer res.Body.Close()
 	return doc, nil
 }

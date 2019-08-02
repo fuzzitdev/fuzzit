@@ -2,19 +2,20 @@ package client
 
 import (
 	"bytes"
-	"cloud.google.com/go/firestore"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"golang.org/x/oauth2"
-	"google.golang.org/api/option"
 	"io/ioutil"
 	"log"
 	"os"
 	"os/user"
 	"path"
 	"time"
+
+	"cloud.google.com/go/firestore"
+	"golang.org/x/oauth2"
+	"google.golang.org/api/option"
 )
 
 func (c *fuzzitClient) ReAuthenticate(force bool) error {
@@ -60,7 +61,7 @@ func (c *fuzzitClient) ReAuthenticate(force bool) error {
 		r, err = c.httpClient.Post(
 			"https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyCustomToken?key=AIzaSyCs_Sm1VOKZwJZmTXdOCvs1wyn91vYMNSY",
 			"application/json",
-			bytes.NewBuffer([]byte(fmt.Sprintf(`{"token": "%s", "returnSecureToken": true}`, c.CustomToken))))
+			bytes.NewBufferString(fmt.Sprintf(`{"token": "%s", "returnSecureToken": true}`, c.CustomToken)))
 		if err != nil {
 			return err
 		}
