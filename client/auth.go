@@ -2,19 +2,20 @@ package client
 
 import (
 	"bytes"
-	"cloud.google.com/go/firestore"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"golang.org/x/oauth2"
-	"google.golang.org/api/option"
 	"io/ioutil"
 	"log"
 	"os"
 	"os/user"
 	"path"
 	"time"
+
+	"cloud.google.com/go/firestore"
+	"golang.org/x/oauth2"
+	"google.golang.org/api/option"
 )
 
 func (c *fuzzitClient) ReAuthenticate(force bool) error {
@@ -22,17 +23,20 @@ func (c *fuzzitClient) ReAuthenticate(force bool) error {
 	if err != nil {
 		log.Fatal(err)
 	}
-	CacheFile := path.Join(usr.HomeDir, ".fuzzit.cache")
+	cacheFile := path.Join(usr.HomeDir, ".fuzzit.cache")
 
 	if !force {
-		file, err := os.Open(CacheFile)
+		file, err := os.Open(cacheFile)
 		if err != nil {
 			return err
 		}
-		defer file.Close()
 
 		err = json.NewDecoder(file).Decode(c)
+		file.Close()
 		if err != nil {
+			// try to prevent being stuck forever if cache file gets corrupted
+			os.Remove(cacheFile)    // if a file
+			os.RemoveAll(cacheFile) // if a directory
 			return err
 		}
 	}
@@ -76,7 +80,7 @@ func (c *fuzzitClient) ReAuthenticate(force bool) error {
 		if err != nil {
 			return err
 		}
-		err = ioutil.WriteFile(CacheFile, cBytes, 0644)
+		err = ioutil.WriteFile(cacheFile, cBytes, 0644)
 		if err != nil {
 			return err
 		}
