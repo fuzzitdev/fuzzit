@@ -62,7 +62,7 @@ func (c *fuzzitClient) ReAuthenticate(force bool) error {
 		r, err = c.httpClient.Post(
 			"https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyCustomToken?key=AIzaSyCs_Sm1VOKZwJZmTXdOCvs1wyn91vYMNSY",
 			"application/json",
-			bytes.NewBuffer([]byte(fmt.Sprintf(`{"token": "%s", "returnSecureToken": true}`, c.CustomToken))))
+			bytes.NewBufferString(fmt.Sprintf(`{"token": "%s", "returnSecureToken": true}`, c.CustomToken)))
 		if err != nil {
 			return err
 		}

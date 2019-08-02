@@ -2,6 +2,7 @@ package client
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -28,7 +29,7 @@ func (c *fuzzitClient) getStorageLink(storagePath string) (string, error) {
 		return "", fmt.Errorf("API Key is not valid")
 	}
 
-	res := storageLinkResponse{}
+	var res storageLinkResponse
 	err = json.NewDecoder(r.Body).Decode(&res)
 	if err != nil {
 		return "", err
@@ -59,14 +60,13 @@ func (c *fuzzitClient) uploadFile(filePath string, storagePath string, contentTy
 	if err != nil {
 		return err
 	}
+	defer res.Body.Close()
 	if res.StatusCode != http.StatusOK {
 		bodyBytes, err := ioutil.ReadAll(res.Body)
 		if err != nil {
 			log.Fatal(err)
 		}
-		bodyString := string(bodyBytes)
-		return fmt.Errorf(bodyString)
+		return errors.New(string(bodyBytes))
 	}
-	defer res.Body.Close()
 	return nil
 }
