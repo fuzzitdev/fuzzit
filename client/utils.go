@@ -26,7 +26,14 @@ func copyFile(dst, src string) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
-	defer destination.Close()
 	nBytes, err := io.Copy(destination, source)
-	return nBytes, err
+	errClose := destination.Close()
+	if err != nil {
+		return 0, err
+	}
+	if errClose != nil {
+		return 0, errClose
+	}
+
+	return nBytes, nil
 }
