@@ -31,6 +31,7 @@ type job struct {
 	Namespace string    `firestore:"namespace"`
 	StartedAt time.Time `firestore:"started_at,serverTimestamp"`
 	OrgId     string    `firestore:"org_id"`
+	V2        bool      `firestore:"v2"`
 	Job
 }
 

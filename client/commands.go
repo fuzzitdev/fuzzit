@@ -1,14 +1,11 @@
 package client
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
-	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
@@ -97,12 +94,6 @@ func (c *fuzzitClient) CreateTarget(targetConfig Target, seedPath string) (*fire
 func (c *fuzzitClient) CreateJob(jobConfig Job, files []string) (*firestore.DocumentRef, error) {
 	ctx := context.Background()
 
-	for _, filename := range files {
-		if st, err := os.Stat(filename); err != nil || !st.Mode().IsRegular() {
-			return nil, errors.New(fmt.Sprintf("File %s doesn't exist...", filename))
-		}
-	}
-
 	collectionRef := c.firestoreClient.Collection("orgs/" + c.Org + "/targets/" + jobConfig.TargetId + "/jobs")
 	fullJob := job{}
 	fullJob.Job = jobConfig
@@ -110,11 +101,9 @@ func (c *fuzzitClient) CreateJob(jobConfig Job, files []string) (*firestore.Docu
 	fullJob.OrgId = c.Org
 	fullJob.Namespace = c.Namespace
 	fullJob.Status = "in progress"
-	doc, _, err := collectionRef.Add(ctx, fullJob)
-	if err != nil {
-		return nil, err
-	}
-	log.Println("Created new job ", doc.ID)
+	fullJob.V2 = true
+
+	jobRef := collectionRef.NewDoc()
 
 	fuzzerPath := files[0]
 	filename := filepath.Base(fuzzerPath)
@@ -144,34 +133,21 @@ func (c *fuzzitClient) CreateJob(jobConfig Job, files []string) (*firestore.Docu
 		fuzzerPath = tmpfile
 	}
 
-	storagePath := fmt.Sprintf("orgs/%s/targets/%s/jobs/%s/fuzzer", c.Org, jobConfig.TargetId, doc.ID)
-	err = c.uploadFile(fuzzerPath, storagePath, "application/gzip", "fuzzer.tar.gz")
+	storagePath := fmt.Sprintf("orgs/%s/targets/%s/jobs/%s/fuzzer", c.Org, jobConfig.TargetId, jobRef.ID)
+	log.Println("Uploading fuzzer...")
+	err := c.uploadFile(fuzzerPath, storagePath, "application/gzip", "fuzzer.tar.gz")
 	if err != nil {
 		return nil, err
 	}
 
-	jsonStr := fmt.Sprintf(`{"data": {"org_id": "%s", "target_id": "%s", "job_id": "%s"}}`, c.Org, jobConfig.TargetId, doc.ID)
-	req, err := http.NewRequest("POST",
-		"https://us-central1-fuzzit-b5fbf.cloudfunctions.net/startJob",
-		bytes.NewBufferString(jsonStr))
+	log.Println("Starting job")
+	_, err = jobRef.Set(ctx, fullJob)
 	if err != nil {
+		log.Printf("Please check that the target '%s' exists and you have sufficiant permissions",
+			jobConfig.TargetId)
 		return nil, err
 	}
-	req.Header.Set("Authorization", "Bearer "+c.IdToken)
-	req.Header.Set("Content-Type", "application/json")
 
-	res, err := httpClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer res.Body.Close()
-	if res.StatusCode != http.StatusOK {
-		bodyBytes, err := ioutil.ReadAll(res.Body)
-		if err != nil {
-			log.Fatal(err)
-		}
-		return nil, errors.New(string(bodyBytes))
-	}
-	fmt.Printf("Job %s started succesfully\n", doc.ID)
-	return doc, nil
+	log.Printf("Job %s started succesfully\n", jobRef.ID)
+	return jobRef, nil
 }

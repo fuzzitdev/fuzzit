@@ -50,7 +50,6 @@ func (c *fuzzitClient) uploadFile(filePath string, storagePath string, contentTy
 		return err
 	}
 
-	fmt.Println("uploading fuzzer...")
 	req, err := http.NewRequest("PUT", storageLink, data)
 	if err != nil {
 		return err

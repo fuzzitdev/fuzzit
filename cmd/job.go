@@ -35,7 +35,7 @@ var jobCmd = &cobra.Command{
 			log.Fatalf("--type should be either fuzzing or sanity. Recieved: %s", newJob.Type)
 		}
 
-		log.Println("Creating job...")
+		log.Println("Creating job")
 		c, err := client.LoadFuzzitFromCache()
 		if err != nil {
 			log.Fatal(err)
