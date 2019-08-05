@@ -17,9 +17,9 @@ package cmd
 
 import (
 	"github.com/fuzzitdev/fuzzit/client"
-	"log"
-
 	"github.com/spf13/cobra"
+	"log"
+	"strings"
 )
 
 // jobCmd represents the job command
@@ -35,13 +35,29 @@ var jobCmd = &cobra.Command{
 			log.Fatalf("--type should be either fuzzing or sanity. Recieved: %s", newJob.Type)
 		}
 
-		log.Println("Creating job")
+		log.Println("Creating job...")
 		c, err := client.LoadFuzzitFromCache()
 		if err != nil {
 			log.Fatal(err)
 		}
-		newJob.TargetId = args[0]
-		_, err = c.CreateJob(newJob, args[1:])
+
+		target := args[0]
+		targetSplice := strings.Split(args[0], "/")
+		if len(targetSplice) > 2 {
+			log.Fatalf("[TARGET] can only be of type 'target' or 'project/target-name'.")
+		} else if len(targetSplice) == 2 {
+			target = targetSplice[1]
+			c.Org = targetSplice[0]
+		}
+
+		newJob.TargetId = target
+
+		if newJob.Local {
+			err = c.CreateLocalJob(newJob, args[1:])
+		} else {
+			_, err = c.CreateJob(newJob, args[1:])
+		}
+
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -53,6 +69,7 @@ func init() {
 	createCmd.AddCommand(jobCmd)
 
 	jobCmd.Flags().StringVar(&newJob.Type, "type", "fuzzing", "fuzzing/sanity")
+	jobCmd.Flags().BoolVar(&newJob.Local, "local", false, "run fuzzing/sanity locally in a docker")
 	jobCmd.Flags().Uint16Var(&newJob.Parallelism, "cpus", 1, "number of cpus to use (only relevant for fuzzing job)")
 	jobCmd.Flags().StringVar(&newJob.Revision, "revision", "", "Revision tag of fuzzer")
 	jobCmd.Flags().StringVar(&newJob.Branch, "branch", "", "Branch of the fuzzer")

@@ -24,7 +24,7 @@ import (
 var cfgFile string
 
 var rootCmd = &cobra.Command{
-	Use:     "Fuzzit",
+	Use:     "fuzzit",
 	Short:   "Continuous fuzzing made simple CLI",
 	Version: "2.3.0",
 }

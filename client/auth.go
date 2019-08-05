@@ -9,7 +9,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/url"
-	"os"
 	"os/user"
 	"path"
 	"time"
@@ -19,33 +18,7 @@ import (
 	"google.golang.org/api/option"
 )
 
-func (c *fuzzitClient) ReAuthenticate(force bool) error {
-	usr, err := user.Current()
-	if err != nil {
-		log.Fatal(err)
-	}
-	cacheFile := path.Join(usr.HomeDir, ".fuzzit.cache")
-
-	if !force {
-		file, err := os.Open(cacheFile)
-		if err != nil {
-			return err
-		}
-
-		err = json.NewDecoder(file).Decode(c)
-		file.Close()
-		if err != nil {
-			// try to prevent being stuck forever if cache file gets corrupted
-			os.Remove(cacheFile)    // if a file
-			os.RemoveAll(cacheFile) // if a directory
-			return err
-		}
-	}
-
-	if c.ApiKey == "" {
-		return errors.New("API Key is no configured, please run fuzzit auth [api_key]")
-	}
-
+func (c *fuzzitClient) refreshToken() error {
 	if c.IdToken == "" || (time.Now().Unix()-c.LastRefresh) > 60*45 {
 		createCustomTokenEndpoint := fmt.Sprintf("%s/createCustomToken?api_key=%s", FuzzitEndpoint, url.QueryEscape(c.ApiKey))
 		r, err := c.httpClient.Get(createCustomTokenEndpoint)
@@ -54,7 +27,7 @@ func (c *fuzzitClient) ReAuthenticate(force bool) error {
 		}
 		defer r.Body.Close()
 		if r.StatusCode != 200 {
-			return errors.New("API Key is not valid")
+			return errors.New("API Key is not valid. Try running fuzzit auth <API_KEY> again")
 		}
 
 		err = json.NewDecoder(r.Body).Decode(c)
@@ -81,6 +54,12 @@ func (c *fuzzitClient) ReAuthenticate(force bool) error {
 		if err != nil {
 			return err
 		}
+
+		usr, err := user.Current()
+		if err != nil {
+			log.Fatal(err)
+		}
+		cacheFile := path.Join(usr.HomeDir, ".fuzzit.cache")
 		err = ioutil.WriteFile(cacheFile, cBytes, 0644)
 		if err != nil {
 			return err
@@ -97,7 +76,6 @@ func (c *fuzzitClient) ReAuthenticate(force bool) error {
 	tokenSource := oauth2.StaticTokenSource(&token)
 	ctx := context.Background()
 
-	// some known issue with go afaik
 	firestoreClient, err := firestore.NewClient(ctx, "fuzzit-b5fbf", option.WithTokenSource(tokenSource))
 	c.firestoreClient = firestoreClient
 
