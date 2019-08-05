@@ -73,22 +73,28 @@ func (c *fuzzitClient) GetResource(resource string) error {
 	}
 }
 
-func (c *fuzzitClient) CreateTarget(targetConfig Target, seedPath string) (*firestore.DocumentRef, error) {
+func (c *fuzzitClient) CreateTarget(targetName string, seedPath string) (*firestore.DocumentRef, error) {
 	ctx := context.Background()
-	collectionRef := c.firestoreClient.Collection("orgs/" + c.Org + "/targets")
-	doc, _, err := collectionRef.Add(ctx, targetConfig)
-	if err != nil {
-		return nil, err
+	docRef := c.firestoreClient.Doc("orgs/" + c.Org + "/targets/" + targetName)
+	_, err := docRef.Get(ctx)
+	if err == nil {
+		return nil, fmt.Errorf("target %s already exist", targetName)
 	}
 
 	if seedPath != "" {
-		storagePath := fmt.Sprintf("orgs/%s/targets/%s/seed", c.Org, doc.ID)
+		storagePath := fmt.Sprintf("orgs/%s/targets/%s/seed", c.Org, targetName)
 		err := c.uploadFile(seedPath, storagePath, "application/gzip", "seed.tar.gz")
 		if err != nil {
 			return nil, err
 		}
 	}
-	return doc, nil
+
+	_, err = docRef.Set(ctx, Target{Name: targetName})
+	if err != nil {
+		return nil, err
+	}
+
+	return docRef, nil
 }
 
 func (c *fuzzitClient) CreateJob(jobConfig Job, files []string) (*firestore.DocumentRef, error) {

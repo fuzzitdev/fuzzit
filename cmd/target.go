@@ -32,14 +32,12 @@ var targetCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		newTarget := client.Target{
-			Name: args[0],
-		}
+
 		seed, err := cmd.Flags().GetString("seed")
 		if err != nil {
 			log.Fatal(err)
 		}
-		docRef, err := c.CreateTarget(newTarget, seed)
+		docRef, err := c.CreateTarget(args[0], seed)
 		if err != nil {
 			log.Fatal(err)
 		}
