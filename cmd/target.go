@@ -37,11 +37,11 @@ var targetCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		docRef, err := c.CreateTarget(args[0], seed)
+		_, err = c.CreateTarget(args[0], seed)
 		if err != nil {
 			log.Fatal(err)
 		}
-		log.Printf("Created new target: %s successfully with id: %s\n", args[0], docRef.ID)
+		log.Printf("Created new target: %s successfully", args[0])
 	},
 }
 

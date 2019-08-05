@@ -199,7 +199,7 @@ func (c *fuzzitClient) CreateLocalJob(jobConfig Job, files []string) error {
 	}
 
 	log.Println("Pulling container")
-	reader, err := cli.ImagePull(ctx, "docker.io/fuzzitdev/fuzzit:stretch-llvm9", types.ImagePullOptions{})
+	reader, err := cli.ImagePull(ctx, "docker.io/fuzzitdev/fuzzit:stretch-llvm8", types.ImagePullOptions{})
 	if err != nil {
 		return err
 	}
@@ -216,7 +216,8 @@ func (c *fuzzitClient) CreateLocalJob(jobConfig Job, files []string) error {
 			"ASAN_OPTIONS=" + jobConfig.AsanOptions,
 			"UBSAN_OPTIONS=" + jobConfig.UbsanOptions,
 			"ARGS=" + jobConfig.Args},
-		Image:       "docker.io/fuzzitdev/fuzzit:stretch-llvm9",
+		Image:       "docker.io/fuzzitdev/fuzzit:stretch-llvm8",
+		Cmd:         []string{"/app/run.sh"},
 		AttachStdin: true,
 	}, nil, nil, "")
 	if err != nil {
