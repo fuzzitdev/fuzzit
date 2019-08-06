@@ -4,6 +4,7 @@ go 1.12
 
 require (
 	cloud.google.com/go v0.43.0
+	github.com/Microsoft/go-winio v0.4.13 // indirect
 	github.com/containerd/containerd v1.2.7 // indirect
 	github.com/docker/distribution v2.7.1+incompatible // indirect
 	github.com/docker/docker v0.7.3-0.20190802030316-4e83c90ae836

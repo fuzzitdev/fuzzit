@@ -49,7 +49,7 @@ func (c *fuzzitClient) uploadFile(filePath string, storagePath string, contentTy
 	}
 	defer data.Close()
 
-	storageLink, err := c.getStorageLink(storagePath, "write")
+	storageLink, err := c.getStorageLink(storagePath, "create")
 	if err != nil {
 		return err
 	}
