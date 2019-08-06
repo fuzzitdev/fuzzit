@@ -253,9 +253,8 @@ func (c *fuzzitClient) CreateLocalJob(jobConfig Job, files []string) error {
 			"UBSAN_OPTIONS=" + jobConfig.UbsanOptions,
 			"ARGS=" + jobConfig.Args,
 			"LD_LIBRARY_PATH=/app"},
-		Image: "docker.io/fuzzitdev/fuzzit:stretch-llvm8",
-		//Cmd:         []string{"/bin/sh", "/app/run.sh"},
-		Cmd:         []string{"/bin/sleep", "100000"},
+		Image:       "docker.io/fuzzitdev/fuzzit:stretch-llvm8",
+		Cmd:         []string{"/bin/sh", "/app/run.sh"},
 		AttachStdin: true,
 	}, nil, nil, "")
 	if err != nil {
