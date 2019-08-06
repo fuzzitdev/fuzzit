@@ -251,9 +251,11 @@ func (c *fuzzitClient) CreateLocalJob(jobConfig Job, files []string) error {
 			"SEED_LINK=" + seedLink,
 			"ASAN_OPTIONS=" + jobConfig.AsanOptions,
 			"UBSAN_OPTIONS=" + jobConfig.UbsanOptions,
-			"ARGS=" + jobConfig.Args},
-		Image:       "docker.io/fuzzitdev/fuzzit:stretch-llvm8",
-		Cmd:         []string{"/bin/sh", "/app/run.sh"},
+			"ARGS=" + jobConfig.Args,
+			"LD_LIBRARY_PATH=/app"},
+		Image: "docker.io/fuzzitdev/fuzzit:stretch-llvm8",
+		//Cmd:         []string{"/bin/sh", "/app/run.sh"},
+		Cmd:         []string{"/bin/sleep", "100000"},
 		AttachStdin: true,
 	}, nil, nil, "")
 	if err != nil {

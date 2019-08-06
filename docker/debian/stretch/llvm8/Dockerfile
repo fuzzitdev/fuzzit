@@ -1,4 +1,4 @@
-FROM debian:stretch-slim
+FROM debian:stretch
 
 LABEL maintainer="Fuzzit.dev, inc."
 
