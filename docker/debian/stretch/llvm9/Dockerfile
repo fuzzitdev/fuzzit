@@ -11,7 +11,3 @@ RUN apt-get update && apt-get install -y libllvm-9-ocaml-dev libllvm9 llvm-9 llv
 RUN ln -s /usr/lib/llvm-9/bin/llvm-symbolizer /bin/llvm-symbolizer
 
 WORKDIR /app
-
-ADD run.sh /app/run.sh
-
-CMD /app/run.sh

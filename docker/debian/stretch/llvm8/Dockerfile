@@ -11,5 +11,3 @@ RUN apt-get update && apt-get install -y libllvm-8-ocaml-dev libllvm8 llvm-8 llv
 RUN ln -s /usr/lib/llvm-8/bin/llvm-symbolizer /bin/llvm-symbolizer
 
 WORKDIR /app
-
-ADD run.sh /app/run.sh

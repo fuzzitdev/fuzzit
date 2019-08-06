@@ -1,6 +1,7 @@
 package client
 
 import (
+	"archive/tar"
 	"cloud.google.com/go/firestore"
 	"context"
 	"encoding/json"
@@ -167,6 +168,41 @@ func (c *fuzzitClient) CreateTarget(targetName string, seedPath string) (*firest
 	return docRef, nil
 }
 
+func (c *fuzzitClient) getRunShTar() (*os.File, error) {
+	tmpfile, err := ioutil.TempFile("", "run.*.tar")
+	if err != nil {
+		log.Fatal(err)
+	}
+	tw := tar.NewWriter(tmpfile)
+	hdr := &tar.Header{
+		Name: "run.sh",
+		Mode: 0777,
+		Size: int64(len(runSh)),
+	}
+	if err := tw.WriteHeader(hdr); err != nil {
+		return nil, err
+	}
+	if _, err := tw.Write([]byte(runSh)); err != nil {
+		return nil, err
+	}
+	if err := tw.Flush(); err != nil {
+		return nil, err
+	}
+	if err := tw.Close(); err != nil {
+		return nil, err
+	}
+	if err := tmpfile.Close(); err != nil {
+		return nil, err
+	}
+
+	runShTar, err := os.Open(tmpfile.Name())
+	if err != nil {
+		return nil, err
+	}
+
+	return runShTar, nil
+}
+
 func (c *fuzzitClient) CreateLocalJob(jobConfig Job, files []string) error {
 	ctx := context.Background()
 	cli, err := client.NewClientWithOpts(client.FromEnv)
@@ -217,7 +253,7 @@ func (c *fuzzitClient) CreateLocalJob(jobConfig Job, files []string) error {
 			"UBSAN_OPTIONS=" + jobConfig.UbsanOptions,
 			"ARGS=" + jobConfig.Args},
 		Image:       "docker.io/fuzzitdev/fuzzit:stretch-llvm8",
-		Cmd:         []string{"/app/run.sh"},
+		Cmd:         []string{"/bin/sh", "/app/run.sh"},
 		AttachStdin: true,
 	}, nil, nil, "")
 	if err != nil {
@@ -225,7 +261,19 @@ func (c *fuzzitClient) CreateLocalJob(jobConfig Job, files []string) error {
 	}
 
 	log.Println("Uploading fuzzer to container")
-	err = cli.CopyToContainer(ctx, createdContainer.ID, "/app/", fuzzer, types.CopyToContainerOptions{
+	err = cli.CopyToContainer(ctx, createdContainer.ID, "/app", fuzzer, types.CopyToContainerOptions{
+		AllowOverwriteDirWithFile: true,
+	})
+	if err != nil {
+		return err
+	}
+
+	runShTar, err := c.getRunShTar()
+	if err != nil {
+		return err
+	}
+	log.Println("Uploading run.sh to container")
+	err = cli.CopyToContainer(ctx, createdContainer.ID, "/app/", runShTar, types.CopyToContainerOptions{
 		AllowOverwriteDirWithFile: true,
 	})
 	if err != nil {
