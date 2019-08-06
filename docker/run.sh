@@ -13,7 +13,7 @@ else
     echo "corpus is still empty. continuing without..."
 fi
 
-wget -O seed $CORPUS_LINK || rm -f seed
+wget -O seed $SEED_LINK || rm -f seed
 if test -f "seed"; then
     case $(file --mime-type -b seed) in
         application/x-gzip)
@@ -31,7 +31,7 @@ if test -f "seed"; then
 else
     echo "seed corpus is empty. continuing without..."
 fi
-ls -la
+
 if test -f "fuzzer"; then
     echo "running fuzzer"
     chmod a+x fuzzer
