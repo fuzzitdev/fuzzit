@@ -31,7 +31,7 @@ go get -v -u github.com/fuzzitdev/fuzzit/...
 #### Homebrew Tap
 
 ```bash
-brew install fuzzitdev/tapfuzzit
+brew install fuzzitdev/tap/fuzzit
 ```
 
 ## Compilation
