@@ -31,3 +31,22 @@ changelog:
     exclude:
     - '^docs:'
     - '^test:'
+brews:
+  -
+    name: fuzzit
+
+    github:
+      owner: fuzzitdev
+      name: fuzzit
+
+    # Folder inside the repository to put the formula.
+    # Default is the root folder.
+    folder: Formula
+
+    # Your app's homepage.
+    # Default is empty.
+    homepage: "https://fuzzit.dev"
+
+    # Your app's description.
+    # Default is empty.
+    description: "Continuous Fuzzing Made Simple."
