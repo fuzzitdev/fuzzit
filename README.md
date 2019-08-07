@@ -11,14 +11,28 @@
 
 ## Download
 
+#### Precompiled Binaries
+
 You can download the precompiled release binary from [releases](https://github.com/fuzzitdev/fuzzit/releases) via web
 or via
 
-`wget https://github.com/fuzzitdev/fuzzit/releases/download/<version>/fuzzit_<version>_<os>_<arch>`
+```bash
+wget https://github.com/fuzzitdev/fuzzit/releases/download/<version>/fuzzit_<version>_<os>_<arch>
+```
+
+#### Go Get
 
 Also, you can use the following command to download and compile (This usually takes some time so it's usually faster to either download a pre-compiled release or download the source and build locally):
 
-`go get -v -u github.com/fuzzitdev/fuzzit/...`
+```bash
+go get -v -u github.com/fuzzitdev/fuzzit/...
+```
+
+#### Homebrew Tap
+
+```bash
+brew install fuzzitdev/tapfuzzit
+```
 
 ## Compilation
 
