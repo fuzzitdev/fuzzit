@@ -47,7 +47,7 @@ brews:
 
     github:
       owner: fuzzitdev
-      name: fuzzit
+      name: homebrew-tap
 
     url_template: "https://github.com/fuzzitdev/fuzzit/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
 
