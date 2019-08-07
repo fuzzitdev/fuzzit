@@ -53,7 +53,7 @@ var downloadCmd = &cobra.Command{
 		}
 
 		if resource == "corpus" {
-			localPath := "corpus"
+			localPath := "corpus.tar.gz"
 			if len(args) > 2 {
 				localPath = args[2]
 			}

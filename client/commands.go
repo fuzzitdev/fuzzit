@@ -65,7 +65,7 @@ func (c *fuzzitClient) DownloadSeed(dst string, target string) error {
 }
 
 func (c *fuzzitClient) DownloadCorpus(dst string, target string) error {
-	storagePath := fmt.Sprintf("orgs/%s/targets/%s/corpus", c.Org, target)
+	storagePath := fmt.Sprintf("orgs/%s/targets/%s/corpus.tar.gz", c.Org, target)
 	err := c.downloadFile(dst, storagePath)
 	if err != nil {
 		return err
