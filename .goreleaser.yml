@@ -42,6 +42,7 @@ brews:
     # Folder inside the repository to put the formula.
     # Default is the root folder.
     folder: Formula
+    url_template: "https://github.com/fuzzitdev/fuzzit/releases/download/{{ .ArtifactName }}/{{ .ArtifactName }}"
 
     # Your app's homepage.
     # Default is empty.
