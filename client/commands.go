@@ -17,6 +17,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	//"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
@@ -143,6 +144,11 @@ func (c *fuzzitClient) CreateTarget(targetName string, seedPath string) (*firest
 	err := c.refreshToken()
 	if err != nil {
 		return nil, err
+	}
+
+	re := regexp.MustCompile("^[a-z0-9-]+$")
+	if !re.MatchString(targetName) {
+		return nil, fmt.Errorf("target can only contain lowercase characetrs, numbers and hypens")
 	}
 
 	ctx := context.Background()
