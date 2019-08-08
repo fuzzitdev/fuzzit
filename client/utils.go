@@ -77,8 +77,9 @@ if test -f "fuzzer"; then
     echo "running fuzzer"
     chmod a+x fuzzer
 
-    ./fuzzer -exact_artifact_path=./artifact -print_final_stats=1 $(find seed_dir -type f) ./corpus_dir/* $ARGS
+    ./fuzzer -exact_artifact_path=./artifact -print_final_stats=1 $(find seed_dir -type f) ./corpus_dir/* $ARGS || exit 1
 else
     echo "failed to locate fuzzer. does 'fuzzer' executable exist in the archive?"
+	exit 1
 fi
 `
