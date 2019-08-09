@@ -22,7 +22,7 @@ wget https://github.com/fuzzitdev/fuzzit/releases/download/<version>/fuzzit_<ver
 
 #### Go Get
 
-Also, you can use the following command to download and compile (This usually takes some time so it's usually faster to either download a pre-compiled release or download the source and build locally):
+Also, you can use the following command to download and compile (This usually takes some time so, it's usually faster to either download a pre-compiled release or download the source and build locally):
 
 ```bash
 go get -v -u github.com/fuzzitdev/fuzzit/...
@@ -46,7 +46,7 @@ go build .
 
 Fuzzit CLI can be used either locally or from your CI.
 
-Run `fuzzit --help` to get a full list of commands or checkout our [docs](https://docs.fuzzit.dev).
+Run `fuzzit --help` to get a full list of commands, or check out our [docs](https://docs.fuzzit.dev).
 
 ## Examples
 
@@ -55,18 +55,18 @@ Fuzzit currently supports C/C++ and Go
 * [C/C++ examples](https://github.com/fuzzitdev/example-c)
 * [Go examples](https://github.com/fuzzitdev/example-go)
 
-More information can be at our [docs](https://docs.fuzzit.dev) 
+More information can be found in our [docs](https://docs.fuzzit.dev).
 
 ## Contribution
 
-Contributions are welcome. If you need additional feature either open a github issue or a PR
-if you like to contribute it. Before contributing a big feature please open an issue so we can discuss and 
-approve before a lot of code is written. For bugfixes also open an issue or PR.
+Contributions are welcome. If you need an additional feature you can open a github issue, or send a PR
+if you'd like to contribute it. Before contributing a big feature please open an issue so we can discuss and 
+approve it before a lot of code is written. For bugfixes also open an issue or PR.
 
 
 ## Versioning
 
-Fuzzit CLI Version contains three components x.y.z . an increase in `z` ensures backward comparability while increase
+Fuzzit CLI Version contains three components x.y.z . an increase in `z` ensures backward compatability while increase
 in `y` might introduce breaking changes.  
 
 ## Reporting Security Vulnerabilities
