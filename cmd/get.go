@@ -18,6 +18,7 @@ package cmd
 import (
 	"github.com/fuzzitdev/fuzzit/client"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"log"
 )
 
@@ -31,12 +32,23 @@ var getCmd = &cobra.Command{
 	./fuzzit get targets/<target_id>/jobs # retrieve all jobs for target
 	./fuzzit get targets/<target_id>/jobs/<job_id> # retrieve specific job`,
 	Args: cobra.ExactArgs(1),
-	Run: func(cmd *cobra.Command, args []string) {
-		c, err := client.LoadFuzzitFromCache()
-		if err != nil {
-			log.Fatal(err)
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		apiKey := viper.GetString("api-key")
+		var err error
+		if apiKey != "" {
+			gFuzzitClient, err = client.NewFuzzitClient(apiKey)
+			if err != nil {
+				log.Fatalln(err)
+			}
+		} else {
+			gFuzzitClient, err = client.LoadFuzzitFromCache()
+			if err != nil {
+				log.Fatalln(err)
+			}
 		}
-		err = c.GetResource(args[0])
+	},
+	Run: func(cmd *cobra.Command, args []string) {
+		err := gFuzzitClient.GetResource(args[0])
 		if err != nil {
 			log.Fatal(err)
 		}

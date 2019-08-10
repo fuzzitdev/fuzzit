@@ -31,15 +31,11 @@ var jobCmd = &cobra.Command{
 	Short: "create new fuzzing job",
 	Args:  cobra.MinimumNArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
-		if newJob.Type != "fuzzing" && newJob.Type != "sanity" {
-			log.Fatalf("--type should be either fuzzing or sanity. Recieved: %s", newJob.Type)
+		if newJob.Type != "fuzzing" && newJob.Type != "regression" {
+			log.Fatalf("--type should be either fuzzing or regression. Recieved: %s", newJob.Type)
 		}
 
 		log.Println("Creating job...")
-		c, err := client.LoadFuzzitFromCache()
-		if err != nil {
-			log.Fatal(err)
-		}
 
 		target := args[0]
 		targetSplice := strings.Split(args[0], "/")
@@ -47,15 +43,16 @@ var jobCmd = &cobra.Command{
 			log.Fatalf("[TARGET] can only be of type 'target' or 'project/target-name'.")
 		} else if len(targetSplice) == 2 {
 			target = targetSplice[1]
-			c.Org = targetSplice[0]
+			gFuzzitClient.Org = targetSplice[0]
 		}
 
 		newJob.TargetId = target
 
+		var err error = nil
 		if newJob.Local {
-			err = c.CreateLocalJob(newJob, args[1:])
+			err = gFuzzitClient.CreateLocalJob(newJob, args[1:])
 		} else {
-			_, err = c.CreateJob(newJob, args[1:])
+			_, err = gFuzzitClient.CreateJob(newJob, args[1:])
 		}
 
 		if err != nil {
@@ -68,8 +65,8 @@ var jobCmd = &cobra.Command{
 func init() {
 	createCmd.AddCommand(jobCmd)
 
-	jobCmd.Flags().StringVar(&newJob.Type, "type", "fuzzing", "fuzzing/sanity")
-	jobCmd.Flags().BoolVar(&newJob.Local, "local", false, "run fuzzing/sanity locally in a docker")
+	jobCmd.Flags().StringVar(&newJob.Type, "type", "fuzzing", "fuzzing/regression")
+	jobCmd.Flags().BoolVar(&newJob.Local, "local", false, "run fuzzing/regression locally in a docker")
 	jobCmd.Flags().Uint16Var(&newJob.Parallelism, "cpus", 1, "number of cpus to use (only relevant for fuzzing job)")
 	jobCmd.Flags().StringVar(&newJob.Revision, "revision", "", "Revision tag of fuzzer")
 	jobCmd.Flags().StringVar(&newJob.Branch, "branch", "", "Branch of the fuzzer")

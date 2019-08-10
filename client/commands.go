@@ -24,7 +24,7 @@ import (
 	//"github.com/docker/docker/pkg/stdcopy"
 )
 
-func (c *fuzzitClient) archiveFiles(files []string) (string, error) {
+func (c *FuzzitClient) archiveFiles(files []string) (string, error) {
 	fuzzerPath := files[0]
 	filename := filepath.Base(fuzzerPath)
 	if !strings.HasSuffix(filename, ".tar.gz") {
@@ -56,7 +56,7 @@ func (c *fuzzitClient) archiveFiles(files []string) (string, error) {
 	return fuzzerPath, nil
 }
 
-func (c *fuzzitClient) DownloadSeed(dst string, target string) error {
+func (c *FuzzitClient) DownloadSeed(dst string, target string) error {
 	storagePath := fmt.Sprintf("orgs/%s/targets/%s/seed", c.Org, target)
 	err := c.downloadFile(dst, storagePath)
 	if err != nil {
@@ -65,7 +65,7 @@ func (c *fuzzitClient) DownloadSeed(dst string, target string) error {
 	return nil
 }
 
-func (c *fuzzitClient) DownloadCorpus(dst string, target string) error {
+func (c *FuzzitClient) DownloadCorpus(dst string, target string) error {
 	storagePath := fmt.Sprintf("orgs/%s/targets/%s/corpus.tar.gz", c.Org, target)
 	err := c.downloadFile(dst, storagePath)
 	if err != nil {
@@ -74,7 +74,7 @@ func (c *fuzzitClient) DownloadCorpus(dst string, target string) error {
 	return nil
 }
 
-func (c *fuzzitClient) DownloadFuzzer(dst string, target string, job string) error {
+func (c *FuzzitClient) DownloadFuzzer(dst string, target string, job string) error {
 	storagePath := fmt.Sprintf("orgs/%s/targets/%s/jobs/%s/fuzzer", c.Org, target, job)
 	err := c.downloadFile(dst, storagePath)
 	if err != nil {
@@ -83,7 +83,7 @@ func (c *fuzzitClient) DownloadFuzzer(dst string, target string, job string) err
 	return nil
 }
 
-func (c *fuzzitClient) GetResource(resource string) error {
+func (c *FuzzitClient) GetResource(resource string) error {
 	err := c.refreshToken()
 	if err != nil {
 		return err
@@ -140,7 +140,7 @@ func (c *fuzzitClient) GetResource(resource string) error {
 	}
 }
 
-func (c *fuzzitClient) CreateTarget(targetName string, seedPath string) (*firestore.DocumentRef, error) {
+func (c *FuzzitClient) CreateTarget(targetName string, seedPath string) (*firestore.DocumentRef, error) {
 	err := c.refreshToken()
 	if err != nil {
 		return nil, err
@@ -174,7 +174,7 @@ func (c *fuzzitClient) CreateTarget(targetName string, seedPath string) (*firest
 	return docRef, nil
 }
 
-func (c *fuzzitClient) getRunShTar() (*os.File, error) {
+func (c *FuzzitClient) getRunShTar() (*os.File, error) {
 	tmpfile, err := ioutil.TempFile("", "run.*.tar")
 	if err != nil {
 		log.Fatal(err)
@@ -209,7 +209,7 @@ func (c *fuzzitClient) getRunShTar() (*os.File, error) {
 	return runShTar, nil
 }
 
-func (c *fuzzitClient) CreateLocalJob(jobConfig Job, files []string) error {
+func (c *FuzzitClient) CreateLocalJob(jobConfig Job, files []string) error {
 	ctx := context.Background()
 	cli, err := client.NewClientWithOpts(client.FromEnv)
 	if err != nil {
@@ -327,7 +327,7 @@ func (c *fuzzitClient) CreateLocalJob(jobConfig Job, files []string) error {
 	return nil
 }
 
-func (c *fuzzitClient) CreateJob(jobConfig Job, files []string) (*firestore.DocumentRef, error) {
+func (c *FuzzitClient) CreateJob(jobConfig Job, files []string) (*firestore.DocumentRef, error) {
 	err := c.refreshToken()
 	if err != nil {
 		return nil, err

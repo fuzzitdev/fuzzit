@@ -17,16 +17,20 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/fuzzitdev/fuzzit/client"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+	"log"
 	"os"
+	"strings"
 )
 
-var cfgFile string
+var gFuzzitClient *client.FuzzitClient
 
 var rootCmd = &cobra.Command{
 	Use:     "fuzzit",
 	Short:   "Continuous fuzzing made simple CLI",
-	Version: "2.4.16",
+	Version: "2.4.17",
 }
 
 func Execute() {
@@ -38,10 +42,16 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(initConfig)
+	rootCmd.PersistentFlags().String("api-key", "", "Authentication token (can also be passed via env: FUZZIT_API_KEY)")
+	if err := viper.BindPFlag("api-key", rootCmd.PersistentFlags().Lookup("api-key")); err != nil {
+		log.Fatalln(err)
+	}
 
 }
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-
+	viper.AutomaticEnv()
+	viper.SetEnvPrefix("FUZZIT")
+	viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
 }

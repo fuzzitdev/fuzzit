@@ -16,7 +16,6 @@ limitations under the License.
 package cmd
 
 import (
-	"github.com/fuzzitdev/fuzzit/client"
 	"github.com/spf13/cobra"
 	"log"
 )
@@ -28,16 +27,12 @@ var targetCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		log.Println("Creating target...")
-		c, err := client.LoadFuzzitFromCache()
-		if err != nil {
-			log.Fatal(err)
-		}
 
 		seed, err := cmd.Flags().GetString("seed")
 		if err != nil {
 			log.Fatal(err)
 		}
-		_, err = c.CreateTarget(args[0], seed)
+		_, err = gFuzzitClient.CreateTarget(args[0], seed)
 		if err != nil {
 			log.Fatal(err)
 		}

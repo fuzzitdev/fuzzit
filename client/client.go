@@ -41,7 +41,7 @@ type job struct {
 	Job
 }
 
-type fuzzitClient struct {
+type FuzzitClient struct {
 	Org             string
 	Namespace       string
 	ApiKey          string
@@ -55,8 +55,8 @@ type fuzzitClient struct {
 	httpClient      *http.Client
 }
 
-func NewFuzzitClient(apiKey string) (*fuzzitClient, error) {
-	c := &fuzzitClient{}
+func NewFuzzitClient(apiKey string) (*FuzzitClient, error) {
+	c := &FuzzitClient{}
 	c.httpClient = &http.Client{Timeout: 60 * time.Second}
 	c.ApiKey = apiKey
 	err := c.refreshToken()
@@ -66,8 +66,8 @@ func NewFuzzitClient(apiKey string) (*fuzzitClient, error) {
 	return c, nil
 }
 
-func LoadFuzzitFromCache() (*fuzzitClient, error) {
-	c := &fuzzitClient{}
+func LoadFuzzitFromCache() (*FuzzitClient, error) {
+	c := &FuzzitClient{}
 	c.httpClient = &http.Client{Timeout: 60 * time.Second}
 
 	usr, err := user.Current()
