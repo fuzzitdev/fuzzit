@@ -50,10 +50,11 @@ Run `fuzzit --help` to get a full list of commands or checkout our [docs](https:
 
 ## Examples
 
-Fuzzit currently supports C/C++ and Go
+Fuzzit currently supports C/C++, Go and Rust
 
-* [C/C++ examples](https://github.com/fuzzitdev/example-c)
-* [Go examples](https://github.com/fuzzitdev/example-go)
+* [C/C++ example](https://github.com/fuzzitdev/example-c)
+* [Go example](https://github.com/fuzzitdev/example-go)
+* [Rust example](https://github.com/fuzzitdev/example-rust)
 
 More information can be at our [docs](https://docs.fuzzit.dev) 
 

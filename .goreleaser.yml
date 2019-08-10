@@ -58,3 +58,78 @@ brews:
     # Your app's description.
     # Default is empty.
     description: "Continuous Fuzzing Made Simple."
+
+snapcrafts:
+  -
+    # You can change the name of the package.
+    # Default: `{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}`
+    # name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+
+    name: fuzzit
+
+    # Wether to publish the snap to the snapcraft store.
+    # Remember you need to `snapcraft login` first.
+    # Defaults to false.
+    publish: true
+
+    # Single-line elevator pitch for your amazing snap.
+    # 79 char long at most.
+    summary: Software to integrate continuous fuzzing to c/c++/go/rust projects.
+
+    description: Continuous fuzzing as a service made simple with fuzzit.
+
+    # A guardrail to prevent you from releasing a snap to all your users before
+    # it is ready.
+    # `devel` will let you release only to the `edge` and `beta` channels in the
+    # store. `stable` will let you release also to the `candidate` and `stable`
+    # channels. More info about channels here:
+    # https://snapcraft.io/docs/reference/channels
+    grade: stable
+
+    # Snaps can be setup to follow three different confinement policies:
+    # `strict`, `devmode` and `classic`. A strict confinement where the snap
+    # can only read and write in its own namespace is recommended. Extra
+    # permissions for strict snaps can be declared as `plugs` for the app, which
+    # are explained later. More info about confinement here:
+    # https://snapcraft.io/docs/reference/confinement
+    confinement: strict
+
+    # Your app's license, based on SPDX license expressions: https://spdx.org/licenses
+    # Default is empty.
+    license: Apache-2.0
+
+    # A snap of type base to be used as the execution environment for this snap.
+    # Valid values are:
+    # * bare - Empty base snap;
+    # * core - Ubuntu Core 16;
+    # * core18 - Ubuntu Core 18.
+    # Default is empty.
+    base: core18
+
+    # Each binary built by GoReleaser is an app inside the snap. In this section
+    # you can declare extra details for those binaries. It is optional.
+    apps:
+
+      # The name of the app must be the same name as the binary built or the snapcraft name.
+      fuzzit:
+
+        # If your app requires extra permissions to work outside of its default
+        # confined space, declare them here.
+        # You can read the documentation about the available plugs and the
+        # things they allow:
+        # https://snapcraft.io/docs/reference/interfaces.
+        plugs: ["personal-files"]
+
+        # Bash completion snippet. More information about completion here:
+        # https://docs.snapcraft.io/tab-completion-for-snaps.
+        # completer: drumroll-completion.bash
+
+    # Allows plugs to be configured. Plugs like system-files and personal-files
+    # require this.
+    # Default is empty.
+    plugs:
+      personal-files:
+        read:
+          - $HOME/.fuzzit.cache
+        write:
+          - $HOME/.fuzzit.cache
