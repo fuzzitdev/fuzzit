@@ -26,7 +26,7 @@ var cfgFile string
 var rootCmd = &cobra.Command{
 	Use:     "fuzzit",
 	Short:   "Continuous fuzzing made simple CLI",
-	Version: "2.4.13",
+	Version: "2.4.14",
 }
 
 func Execute() {
