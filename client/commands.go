@@ -249,16 +249,15 @@ func (c *FuzzitClient) CreateLocalJob(jobConfig Job, files []string) error {
 	if err != nil {
 		return err
 	}
-
 	log.Println("Creating container")
 	createdContainer, err := cli.ContainerCreate(ctx, &container.Config{
-		Env: []string{
-			"CORPUS_LINK=" + corpusLink,
-			"SEED_LINK=" + seedLink,
-			"ASAN_OPTIONS=" + jobConfig.AsanOptions,
-			"UBSAN_OPTIONS=" + jobConfig.UbsanOptions,
-			"ARGS=" + jobConfig.Args,
-			"LD_LIBRARY_PATH=/app"},
+		Env: append(
+			[]string{
+				"CORPUS_LINK=" + corpusLink,
+				"SEED_LINK=" + seedLink,
+				"ARGS=" + jobConfig.Args,
+				"LD_LIBRARY_PATH=/app"},
+			jobConfig.EnvironmentVariables...),
 		Image:       "docker.io/fuzzitdev/fuzzit:stretch-llvm8",
 		Cmd:         []string{"/bin/sh", "/app/run.sh"},
 		AttachStdin: true,

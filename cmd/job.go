@@ -70,7 +70,7 @@ func init() {
 	jobCmd.Flags().Uint16Var(&newJob.Parallelism, "cpus", 1, "number of cpus to use (only relevant for fuzzing job)")
 	jobCmd.Flags().StringVar(&newJob.Revision, "revision", "", "Revision tag of fuzzer")
 	jobCmd.Flags().StringVar(&newJob.Branch, "branch", "", "Branch of the fuzzer")
-	jobCmd.Flags().StringVar(&newJob.AsanOptions, "asan_options", "", "Additional args to ASAN_OPTIONS env VARIABLE")
-	jobCmd.Flags().StringVar(&newJob.UbsanOptions, "ubsan_options", "", "Additional args to UBSAN_OPTIONS env VARIABLE")
+	jobCmd.Flags().StringArrayVarP(&newJob.EnvironmentVariables, "environment", "e", nil,
+		"Additional environment variables for the fuzzer. For example ASAN_OPTINOS, UBSAN_OPTIONS or any other")
 	jobCmd.Flags().StringVar(&newJob.Args, "args", "", "Additional runtime args for the fuzzer")
 }

@@ -32,6 +32,8 @@ go get -v -u github.com/fuzzitdev/fuzzit/...
 
 ```bash
 brew install fuzzitdev/tap/fuzzit
+# After initial install you can upgrade the version via:
+brew upgrade fuzzit
 ```
 
 ## Compilation

@@ -18,16 +18,15 @@ type Target struct {
 }
 
 type Job struct {
-	TargetId     string `firestore:"target_id"`
-	Args         string `firestore:"args"`
-	Local        bool
-	Type         string `firestore:"type"`
-	Host         string `firestore:"host"`
-	Revision     string `firestore:"revision"`
-	Branch       string `firestore:"branch"`
-	Parallelism  uint16 `firestore:"parallelism"`
-	AsanOptions  string `firestore:"asan_options"`
-	UbsanOptions string `firestore:"ubsan_options"`
+	TargetId             string `firestore:"target_id"`
+	Args                 string `firestore:"args"`
+	Local                bool
+	Type                 string   `firestore:"type"`
+	Host                 string   `firestore:"host"`
+	Revision             string   `firestore:"revision"`
+	Branch               string   `firestore:"branch"`
+	Parallelism          uint16   `firestore:"parallelism"`
+	EnvironmentVariables []string `firestore:"environment_variables"`
 }
 
 // Internal struct
