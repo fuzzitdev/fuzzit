@@ -27,7 +27,7 @@ func (c *FuzzitClient) refreshToken() error {
 		}
 		defer r.Body.Close()
 		if r.StatusCode != 200 {
-			return errors.New("API Key is not valid. Try running fuzzit auth <API_KEY> again")
+			return errors.New("Please set env variable FUZZIT_API_KEY or pass --api-key. API Key for you account: https://app.fuzzit.dev/settings")
 		}
 
 		err = json.NewDecoder(r.Body).Decode(c)
