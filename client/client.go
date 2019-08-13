@@ -18,9 +18,8 @@ type Target struct {
 }
 
 type Job struct {
-	TargetId             string `firestore:"target_id"`
-	Args                 string `firestore:"args"`
-	Local                bool
+	TargetId             string   `firestore:"target_id"`
+	Args                 string   `firestore:"args"`
 	Type                 string   `firestore:"type"`
 	Host                 string   `firestore:"host"`
 	Revision             string   `firestore:"revision"`

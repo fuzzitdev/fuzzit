@@ -32,8 +32,8 @@ var jobCmd = &cobra.Command{
 	Short: "create new fuzzing job",
 	Args:  cobra.MinimumNArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
-		if newJob.Type != "fuzzing" && newJob.Type != "regression" {
-			log.Fatalf("--type should be either fuzzing or regression. Recieved: %s", newJob.Type)
+		if newJob.Type != "fuzzing" && newJob.Type != "regression" && newJob.Type != "local-regression" {
+			log.Fatalf("--type should be either fuzzing, regression or local-regression. Recieved: %s", newJob.Type)
 		}
 
 		log.Println("Creating job...")
@@ -50,7 +50,7 @@ var jobCmd = &cobra.Command{
 		newJob.TargetId = target
 
 		var err error = nil
-		if newJob.Local {
+		if newJob.Type == "local-regression" {
 			err = gFuzzitClient.CreateLocalJob(newJob, args[1:])
 		} else {
 			_, err = gFuzzitClient.CreateJob(newJob, args[1:])
@@ -75,8 +75,7 @@ func init() {
 		}
 	}
 
-	jobCmd.Flags().StringVar(&newJob.Type, "type", "fuzzing", "fuzzing/regression")
-	jobCmd.Flags().BoolVar(&newJob.Local, "local", false, "run fuzzing/regression locally in a docker")
+	jobCmd.Flags().StringVar(&newJob.Type, "type", "fuzzing", "fuzzing/regression/local-regression")
 	jobCmd.Flags().Uint16Var(&newJob.Parallelism, "cpus", 1, "number of cpus to use (only relevant for fuzzing job)")
 	jobCmd.Flags().StringVar(&newJob.Revision, "revision", revision, "Revision tag of fuzzer")
 	jobCmd.Flags().StringVar(&newJob.Branch, "branch", "master", "Branch of the fuzzer")
