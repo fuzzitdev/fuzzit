@@ -16,8 +16,10 @@ limitations under the License.
 package cmd
 
 import (
+	"fmt"
 	"github.com/fuzzitdev/fuzzit/client"
 	"github.com/spf13/cobra"
+	"gopkg.in/src-d/go-git.v4"
 	"log"
 	"strings"
 )
@@ -65,11 +67,20 @@ var jobCmd = &cobra.Command{
 func init() {
 	createCmd.AddCommand(jobCmd)
 
+	revision := ""
+	r, err := git.PlainOpen("")
+	if err == nil {
+		revisionHex, err := r.ResolveRevision("HEAD")
+		if err == nil {
+			revision = revisionHex.String()
+		}
+	}
+
 	jobCmd.Flags().StringVar(&newJob.Type, "type", "fuzzing", "fuzzing/regression")
 	jobCmd.Flags().BoolVar(&newJob.Local, "local", false, "run fuzzing/regression locally in a docker")
 	jobCmd.Flags().Uint16Var(&newJob.Parallelism, "cpus", 1, "number of cpus to use (only relevant for fuzzing job)")
-	jobCmd.Flags().StringVar(&newJob.Revision, "revision", "", "Revision tag of fuzzer")
-	jobCmd.Flags().StringVar(&newJob.Branch, "branch", "", "Branch of the fuzzer")
+	jobCmd.Flags().StringVar(&newJob.Revision, "revision", revision, "Revision tag of fuzzer")
+	jobCmd.Flags().StringVar(&newJob.Branch, "branch", "master", "Branch of the fuzzer")
 	jobCmd.Flags().StringArrayVarP(&newJob.EnvironmentVariables, "environment", "e", nil,
 		"Additional environment variables for the fuzzer. For example ASAN_OPTINOS, UBSAN_OPTIONS or any other")
 	jobCmd.Flags().StringVar(&newJob.Args, "args", "", "Additional runtime args for the fuzzer")
