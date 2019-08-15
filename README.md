@@ -36,14 +36,6 @@ brew install fuzzitdev/tap/fuzzit
 brew upgrade fuzzit
 ```
 
-#### Snap
-
-```bash
-sudo snap install fuzzit
-# After initial install you can upgrade the version via:
-sudo snap refresh fuzzit
-```
-
 ## Compilation
 
 ```bash
