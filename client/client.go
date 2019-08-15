@@ -3,11 +3,8 @@ package client
 import (
 	"cloud.google.com/go/firestore"
 	"encoding/json"
-	"log"
 	"net/http"
 	"os"
-	"os/user"
-	"path"
 	"time"
 )
 
@@ -68,11 +65,10 @@ func LoadFuzzitFromCache() (*FuzzitClient, error) {
 	c := &FuzzitClient{}
 	c.httpClient = &http.Client{Timeout: 60 * time.Second}
 
-	usr, err := user.Current()
+	cacheFile, err := getCacheFile()
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
-	cacheFile := path.Join(usr.HomeDir, ".fuzzit.cache")
 
 	if _, err := os.Stat(cacheFile); os.IsNotExist(err) {
 		return c, nil

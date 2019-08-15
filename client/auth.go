@@ -7,10 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/url"
-	"os/user"
-	"path"
 	"time"
 
 	"cloud.google.com/go/firestore"
@@ -55,11 +52,10 @@ func (c *FuzzitClient) refreshToken() error {
 			return err
 		}
 
-		usr, err := user.Current()
+		cacheFile, err := getCacheFile()
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
-		cacheFile := path.Join(usr.HomeDir, ".fuzzit.cache")
 		err = ioutil.WriteFile(cacheFile, cBytes, 0644)
 		if err != nil {
 			return err

@@ -4,7 +4,23 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/user"
+	"path"
 )
+
+func getCacheFile() (string, error) {
+	// This is to solve problem with snap $HOME restrictions
+	home := os.Getenv("HOME")
+	if home == "" {
+		usr, err := user.Current()
+		if err != nil {
+			return "", err
+		}
+		home = usr.HomeDir
+	}
+	cacheFile := path.Join(home, ".fuzzit.cache")
+	return cacheFile, nil
+}
 
 func copyFile(dst, src string) (int64, error) {
 	sourceFileStat, err := os.Stat(src)
