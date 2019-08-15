@@ -118,7 +118,7 @@ snapcrafts:
         # You can read the documentation about the available plugs and the
         # things they allow:
         # https://snapcraft.io/docs/reference/interfaces.
-        plugs: ["network"]
+        plugs: ["network", "docker"]
 
         # Bash completion snippet. More information about completion here:
         # https://docs.snapcraft.io/tab-completion-for-snaps.

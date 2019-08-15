@@ -30,7 +30,7 @@ var gFuzzitClient *client.FuzzitClient
 var rootCmd = &cobra.Command{
 	Use:     "fuzzit",
 	Short:   "Continuous fuzzing made simple CLI",
-	Version: "2.4.24",
+	Version: "2.4.25",
 }
 
 func Execute() {
