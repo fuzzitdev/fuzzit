@@ -22,6 +22,16 @@ func getCacheFile() (string, error) {
 	return cacheFile, nil
 }
 
+func GetValueFromEnv(variables ...string) string {
+	for _, env := range variables {
+		value := os.Getenv(env)
+		if value != "" {
+			return value
+		}
+	}
+	return ""
+}
+
 func copyFile(dst, src string) (int64, error) {
 	sourceFileStat, err := os.Stat(src)
 	if err != nil {
@@ -56,13 +66,13 @@ func copyFile(dst, src string) (int64, error) {
 
 const runSh = `
 #!/bin/sh
-set -x
 
 mkdir corpus_dir
 mkdir seed_dir
 touch corpus_dir/empty # This to avoid fuzzer stuck
 touch seed_dir/empty # This is to avoid fuzzer stuck
 
+echo "Downloading main corpus from Fuzzit servers..."
 wget -O corpus.tar.gz $CORPUS_LINK || rm -f corpus.tar.gz # remove empty file if corpus doesn't exist
 if test -f "corpus.tar.gz"; then
     tar -xzvf corpus.tar.gz -C corpus_dir
@@ -70,6 +80,7 @@ else
     echo "corpus is still empty. continuing without..."
 fi
 
+echo "Downloading seed corpus from Fuzzit servers..."
 wget -O seed $SEED_LINK || rm -f seed
 if test -f "seed"; then
     case $(file --mime-type -b seed) in
@@ -90,9 +101,8 @@ else
 fi
 
 if test -f "fuzzer"; then
-    echo "running fuzzer"
     chmod a+x fuzzer
-
+	echo "running regression..."
     ./fuzzer -exact_artifact_path=./artifact -print_final_stats=1 $(find seed_dir -type f) ./corpus_dir/* $ARGS || exit 1
 else
     echo "failed to locate fuzzer. does 'fuzzer' executable exist in the archive?"
