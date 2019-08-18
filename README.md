@@ -1,4 +1,4 @@
-![Fuzzit Logo](https://app.fuzzit.dev/static/fuzzit.svg)
+![Fuzzit Logo](https://app.fuzzit.dev/static/github_logo.svg)
 
 [![fuzzit](https://app.fuzzit.dev/static/fuzzit-passing-green.svg)](https://app.fuzzit.dev)
 [![license](https://app.fuzzit.dev/static/license-apache-blue.svg)](https://github.com/fuzzitdev/Fuzzit/blob/master/LICENSE)
@@ -25,7 +25,7 @@ wget https://github.com/fuzzitdev/fuzzit/releases/download/<version>/fuzzit_<ver
 Also, you can use the following command to download and compile (This usually takes some time so, it's usually faster to either download a pre-compiled release or download the source and build locally):
 
 ```bash
-go get -v -u github.com/fuzzitdev/fuzzit/...
+go get -v -u github.com/fuzzitdev/fuzzit
 ```
 
 #### Homebrew Tap
