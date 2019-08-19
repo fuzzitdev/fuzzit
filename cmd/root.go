@@ -17,12 +17,13 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/fuzzitdev/fuzzit/client"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"log"
 	"os"
 	"strings"
+
+	"github.com/fuzzitdev/fuzzit/client"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 var gFuzzitClient *client.FuzzitClient
@@ -46,7 +47,6 @@ func init() {
 	if err := viper.BindPFlag("api-key", rootCmd.PersistentFlags().Lookup("api-key")); err != nil {
 		log.Fatalln(err)
 	}
-
 }
 
 // initConfig reads in config file and ENV variables if set.

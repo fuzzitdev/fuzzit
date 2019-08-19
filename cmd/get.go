@@ -16,10 +16,11 @@ limitations under the License.
 package cmd
 
 import (
+	"log"
+
 	"github.com/fuzzitdev/fuzzit/client"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"log"
 )
 
 // getCmd represents the get command

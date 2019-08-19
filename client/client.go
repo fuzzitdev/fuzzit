@@ -1,11 +1,12 @@
 package client
 
 import (
-	"cloud.google.com/go/firestore"
 	"encoding/json"
 	"net/http"
 	"os"
 	"time"
+
+	"cloud.google.com/go/firestore"
 )
 
 const FuzzitEndpoint = "https://app.fuzzit.dev"
@@ -88,7 +89,7 @@ func LoadFuzzitFromCache() (*FuzzitClient, error) {
 		return nil, err
 	}
 
-	//if c.ApiKey == "" {
+	// if c.ApiKey == "" {
 	//	return errors.New("API Key is not configured (will have access only to public repositories)")
 	//}
 

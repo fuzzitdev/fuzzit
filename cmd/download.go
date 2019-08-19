@@ -16,10 +16,11 @@ limitations under the License.
 package cmd
 
 import (
-	"github.com/fuzzitdev/fuzzit/client"
-	"github.com/spf13/cobra"
 	"log"
 	"strings"
+
+	"github.com/fuzzitdev/fuzzit/client"
+	"github.com/spf13/cobra"
 )
 
 // downloadCmd represents the download command
@@ -74,7 +75,6 @@ var downloadCmd = &cobra.Command{
 		} else {
 			log.Fatalf("resource should be either corpus or seed")
 		}
-
 	},
 }
 
