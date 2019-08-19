@@ -75,7 +75,7 @@ touch seed_dir/empty # This is to avoid fuzzer stuck
 echo "Downloading main corpus from Fuzzit servers..."
 wget -O corpus.tar.gz $CORPUS_LINK || rm -f corpus.tar.gz # remove empty file if corpus doesn't exist
 if test -f "corpus.tar.gz"; then
-    tar -xzvf corpus.tar.gz -C corpus_dir
+    tar -xzf corpus.tar.gz -C corpus_dir
 else
     echo "corpus is still empty. continuing without..."
 fi
@@ -85,7 +85,7 @@ wget -O seed $SEED_LINK || rm -f seed
 if test -f "seed"; then
     case $(file --mime-type -b seed) in
         application/gzip|application/x-gzip)
-           tar -xzvf seed -C seed_dir
+           tar -xzf seed -C seed_dir
         ;;
         application/zip)
            unzip seed -d seed_dir

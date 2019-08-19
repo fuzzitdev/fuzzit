@@ -1,4 +1,4 @@
-![Fuzzit Logo](https://app.fuzzit.dev/static/github_logo.svg)
+![Fuzzit Logo](https://app.fuzzit.dev/static/fuzzit-logo.svg)
 
 [![fuzzit](https://app.fuzzit.dev/static/fuzzit-passing-green.svg)](https://app.fuzzit.dev)
 [![license](https://app.fuzzit.dev/static/license-apache-blue.svg)](https://github.com/fuzzitdev/Fuzzit/blob/master/LICENSE)
