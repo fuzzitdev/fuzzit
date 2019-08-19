@@ -342,7 +342,7 @@ func (c *FuzzitClient) CreateJob(jobConfig Job, files []string) (*firestore.Docu
 	fullJob.Completed = 0
 	fullJob.OrgId = c.Org
 	fullJob.Namespace = c.Namespace
-	fullJob.Status = "in progress"
+	fullJob.Status = "queued"
 	fullJob.V2 = true
 
 	jobRef := collectionRef.NewDoc()
