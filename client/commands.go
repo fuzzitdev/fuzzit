@@ -2,16 +2,9 @@ package client
 
 import (
 	"archive/tar"
-	"cloud.google.com/go/firestore"
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/pkg/stdcopy"
-	"github.com/google/uuid"
-	"github.com/mholt/archiver"
-	"google.golang.org/api/iterator"
 	"io"
 	"io/ioutil"
 	"log"
@@ -19,6 +12,16 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+
+	"cloud.google.com/go/firestore"
+
+	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/pkg/stdcopy"
+	"github.com/google/uuid"
+	"github.com/mholt/archiver"
+	"google.golang.org/api/iterator"
+
 	//"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
 	//"github.com/docker/docker/pkg/stdcopy"
@@ -257,7 +260,8 @@ func (c *FuzzitClient) CreateLocalJob(jobConfig Job, files []string) error {
 					"CORPUS_LINK=" + corpusLink,
 					"SEED_LINK=" + seedLink,
 					"ARGS=" + jobConfig.Args,
-					"LD_LIBRARY_PATH=/app"},
+					"LD_LIBRARY_PATH=/app",
+				},
 				jobConfig.EnvironmentVariables...),
 			Image:       "docker.io/fuzzitdev/fuzzit:stretch-llvm8",
 			Cmd:         []string{"/bin/sh", "/app/run.sh"},

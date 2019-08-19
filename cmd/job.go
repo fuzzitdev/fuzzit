@@ -16,11 +16,12 @@ limitations under the License.
 package cmd
 
 import (
+	"log"
+	"strings"
+
 	"github.com/fuzzitdev/fuzzit/client"
 	"github.com/spf13/cobra"
 	"gopkg.in/src-d/go-git.v4"
-	"log"
-	"strings"
 )
 
 // jobCmd represents the job command

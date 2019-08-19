@@ -17,9 +17,10 @@ limitations under the License.
 package cmd
 
 import (
+	"log"
+
 	"github.com/fuzzitdev/fuzzit/client"
 	"github.com/spf13/cobra"
-	"log"
 )
 
 // authCmd represents the auth command
