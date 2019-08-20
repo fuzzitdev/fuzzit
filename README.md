@@ -5,7 +5,8 @@
 [![Join the chat at https://slack.fuzzit.dev](https://app.fuzzit.dev/static/slack-join.svg)](https://slack.fuzzit.dev)
 
 ## Fuzzit
-[Fuzzit](https://fuzzit.dev) helps you integrate Continuous Fuzzing to your C/C++/Go or Rust project with your current CI/CD workflow
+[Fuzzit](https://fuzzit.dev) helps you integrate Continuous Fuzzing to your [C/C++](https://github.com/fuzzitdev/example-c),
+ [Go](https://github.com/fuzzitdev/example-go) or [Rust](https://github.com/fuzzitdev/example-rust) project with your current CI/CD workflow
 
 [![Fuzzit Introduction](https://img.youtube.com/vi/Va7rfTTPiNo/maxresdefault.jpg)](https://www.youtube.com/watch?v=Va7rfTTPiNo)
 
