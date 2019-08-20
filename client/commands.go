@@ -163,7 +163,7 @@ func (c *FuzzitClient) CreateTarget(targetName string, seedPath string) (*firest
 
 	if seedPath != "" {
 		storagePath := fmt.Sprintf("orgs/%s/targets/%s/seed", c.Org, targetName)
-		err := c.uploadFile(seedPath, storagePath, "application/gzip", "seed.tar.gz")
+		err := c.uploadFile(seedPath, storagePath, "seed.tar.gz")
 		if err != nil {
 			return nil, err
 		}
@@ -381,7 +381,7 @@ func (c *FuzzitClient) CreateJob(jobConfig Job, files []string) (*firestore.Docu
 
 	storagePath := fmt.Sprintf("orgs/%s/targets/%s/jobs/%s/fuzzer", c.Org, jobConfig.TargetId, jobRef.ID)
 	log.Println("Uploading fuzzer...")
-	err = c.uploadFile(fuzzerPath, storagePath, "application/gzip", "fuzzer.tar.gz")
+	err = c.uploadFile(fuzzerPath, storagePath, "fuzzer.tar.gz")
 	if err != nil {
 		return nil, err
 	}

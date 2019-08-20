@@ -5,7 +5,7 @@
 [![Join the chat at https://slack.fuzzit.dev](https://app.fuzzit.dev/static/slack-join.svg)](https://slack.fuzzit.dev)
 
 ## Fuzzit
-[Fuzzit](https://fuzzit.dev) helps you integrate Continuous Fuzzing to your current CI/CD workflow
+[Fuzzit](https://fuzzit.dev) helps you integrate Continuous Fuzzing to your C/C++/Go or Rust project with your current CI/CD workflow
 
 [![Fuzzit Introduction](https://img.youtube.com/vi/Va7rfTTPiNo/maxresdefault.jpg)](https://www.youtube.com/watch?v=Va7rfTTPiNo)
 
@@ -59,6 +59,12 @@ Fuzzit currently supports C/C++, Go and Rust
 * [Rust example](https://github.com/fuzzitdev/example-rust)
 
 More information can be found in our [docs](https://docs.fuzzit.dev).
+
+## Notable OSS Projects Using Fuzzit
+* [coredns/coredns (Go)](http://github.com/coredns/coredns)
+* [google/syzkaller (Go)](http://github.com/google/syzkaller)
+* [systemd/systemd (C/C++)](https://github.com/systemd/systemd)
+* [radare/radare2 (C/C++)](https://github.com/radare/radare2) 
 
 ## Contribution
 

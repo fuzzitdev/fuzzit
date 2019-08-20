@@ -42,7 +42,7 @@ func (c *FuzzitClient) getStorageLink(storagePath string, action string) (string
 	return res.StorageLink, nil
 }
 
-func (c *FuzzitClient) uploadFile(filePath string, storagePath string, contentType string, filename string) error {
+func (c *FuzzitClient) uploadFile(filePath string, storagePath string, filename string) error {
 	data, err := os.Open(filePath)
 	if err != nil {
 		return err
