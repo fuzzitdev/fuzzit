@@ -27,6 +27,8 @@ import (
 	//"github.com/docker/docker/pkg/stdcopy"
 )
 
+const stretchLLVM8 = "gcr.io/fuzzit-public/stretch-llvm8:64bdedf"
+
 func (c *FuzzitClient) archiveFiles(files []string) (string, error) {
 	fuzzerPath := files[0]
 	filename := filepath.Base(fuzzerPath)
@@ -244,7 +246,7 @@ func (c *FuzzitClient) CreateLocalJob(jobConfig Job, files []string) error {
 	}
 
 	log.Println("Pulling container")
-	reader, err := cli.ImagePull(ctx, "docker.io/fuzzitdev/fuzzit:stretch-llvm8", types.ImagePullOptions{})
+	reader, err := cli.ImagePull(ctx, stretchLLVM8, types.ImagePullOptions{})
 	if err != nil {
 		return err
 	}
@@ -263,7 +265,7 @@ func (c *FuzzitClient) CreateLocalJob(jobConfig Job, files []string) error {
 					"LD_LIBRARY_PATH=/app",
 				},
 				jobConfig.EnvironmentVariables...),
-			Image:       "docker.io/fuzzitdev/fuzzit:stretch-llvm8",
+			Image:       stretchLLVM8,
 			Cmd:         []string{"/bin/sh", "/app/run.sh"},
 			AttachStdin: true,
 		},
