@@ -1,0 +1,17 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches:
+      - release/*
+
+jobs:
+
+  build:
+ 
+    runs-on: ubuntu-latest
+ 
+    steps:
+    - uses: actions/checkout@v1
+    - name: Build the Docker image
+      run: docker build ./docker/debian/stretch/llvm8 --file ./docker/debian/stretch/llvm8/Dockerfile --tag fuzzitdev/fuzzit:stretch-llvm8
