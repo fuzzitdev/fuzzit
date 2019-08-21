@@ -63,6 +63,7 @@ More information can be found in our [docs](https://docs.fuzzit.dev).
 
 ## Notable OSS Projects Using Fuzzit
 * [coredns/coredns (Go)](http://github.com/coredns/coredns)
+* [prometheus/prometheus (Go)](http://github.com/prometheus/prometheus)
 * [google/syzkaller (Go)](http://github.com/google/syzkaller)
 * [systemd/systemd (C/C++)](https://github.com/systemd/systemd)
 * [radare/radare2 (C/C++)](https://github.com/radare/radare2) 
