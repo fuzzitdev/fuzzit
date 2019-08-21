@@ -2,7 +2,7 @@ FROM debian:stretch
 
 LABEL maintainer="Fuzzit.dev, inc."
 
-RUN apt-get -qqy update && apt-get install -y wget gnupg2
+RUN apt-get -qqy update && apt-get install -y wget gnupg2 unzip
 
 RUN echo "deb http://apt.llvm.org/stretch/ llvm-toolchain-stretch-8 main" >> /etc/apt/sources.list
 RUN echo "deb-src http://apt.llvm.org/stretch/ llvm-toolchain-stretch-8 main" >> /etc/apt/sources.list

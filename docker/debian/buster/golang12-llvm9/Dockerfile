@@ -2,7 +2,7 @@ FROM golang:1.12-buster
 
 LABEL maintainer="Fuzzit.dev, inc."
 
-RUN apt-get -qqy update && apt-get install -y wget gnupg2
+RUN apt-get -qqy update && apt-get install -y wget gnupg2 unzip
 
 RUN echo "deb http://apt.llvm.org/buster/ llvm-toolchain-buster main" >> /etc/apt/sources.list
 RUN echo "deb-src http://apt.llvm.org/buster/ llvm-toolchain-buster main" >> /etc/apt/sources.list
