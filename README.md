@@ -59,6 +59,7 @@ Fuzzit currently supports C/C++, Go and Rust
 * [C/C++ example](https://github.com/fuzzitdev/example-c)
 * [Go example](https://github.com/fuzzitdev/example-go)
 * [Rust example](https://github.com/fuzzitdev/example-rust)
+* [Swift example](https://github.com/fuzzitdev/example-swift)
 
 More information can be found in our [docs](https://docs.fuzzit.dev).
 
