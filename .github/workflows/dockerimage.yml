@@ -16,8 +16,6 @@ jobs:
     - name: Build the Docker image
       run: docker build ./docker/debian/stretch/llvm8 --file ./docker/debian/stretch/llvm8/Dockerfile --tag docker.pkg.github.com/fuzzitdev/fuzzit/swift-5.1-bionic:latest
     - name: Login to Github Registry
-      run: docker login -u yevgenypats -p $GITHUB_TOKEN
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: docker login -u yevgenypats -p ${{ secrets.GITHUB_TOKEN }}
     - name: Push to Github Registry
       run: docker push docker.pkg.github.com/fuzzitdev/fuzzit/swift-5.1-bionic:latest
