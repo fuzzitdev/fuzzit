@@ -36,7 +36,9 @@ var jobCmd = &cobra.Command{
 		if newJob.Type != "fuzzing" && newJob.Type != "regression" && newJob.Type != "local-regression" {
 			log.Fatalf("--type should be either fuzzing, regression or local-regression. Recieved: %s", newJob.Type)
 		}
-
+		if client.HostToDocker[newJob.Host] == "" {
+			log.Fatalf("--host should be one of stretch-llvm8/stretch-llvm9/bionic-swift51. Recieved: %s", newJob.Host)
+		}
 		log.Println("Creating job...")
 
 		target := args[0]
@@ -84,6 +86,7 @@ func init() {
 	jobCmd.Flags().Uint16Var(&newJob.Parallelism, "cpus", 1, "number of cpus to use (only relevant for fuzzing job)")
 	jobCmd.Flags().StringVar(&newJob.Revision, "revision", revision, "Revision tag of fuzzer (populates automatically from git,travis,circleci)")
 	jobCmd.Flags().StringVar(&newJob.Branch, "branch", branch, "Branch of the fuzzer (populates automatically from git,travis,circleci)")
+	jobCmd.Flags().StringVar(&newJob.Host, "host", "stretch-llvm8", "docker image to use when running the fuzzer. Options: stretch-llvm8/stretch-llvm9/bionic-swift51")
 	jobCmd.Flags().StringArrayVarP(&newJob.EnvironmentVariables, "environment", "e", nil,
 		"Additional environment variables for the fuzzer. For example ASAN_OPTINOS, UBSAN_OPTIONS or any other")
 	jobCmd.Flags().StringVar(&newJob.Args, "args", "", "Additional runtime args for the fuzzer")
