@@ -151,7 +151,7 @@ func (c *FuzzitClient) GetResource(resource string) error {
 	}
 }
 
-func (c *FuzzitClient) CreateTarget(target Target, seedPath string, isNotExist bool) (*firestore.DocumentRef, error) {
+func (c *FuzzitClient) CreateTarget(target Target, seedPath string, skipIsExists bool) (*firestore.DocumentRef, error) {
 	err := c.refreshToken()
 	if err != nil {
 		return nil, err
@@ -167,9 +167,9 @@ func (c *FuzzitClient) CreateTarget(target Target, seedPath string, isNotExist b
 	_, err = docRef.Get(ctx)
 	if err != nil && grpc.Code(err) != codes.NotFound {
 		return nil, err
-	} else if err == nil && isNotExist {
+	} else if err == nil && skipIsExists {
 		return docRef, nil
-	} else if err == nil && !isNotExist {
+	} else if err == nil && !skipIsExists {
 		return nil, fmt.Errorf("target %s already exist", target.Name)
 	}
 

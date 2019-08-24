@@ -37,13 +37,13 @@ var targetCmd = &cobra.Command{
 			log.Fatal(err)
 		}
 
-		ifNotExist, err := cmd.Flags().GetBool("if-not-exists")
+		skipIfExists, err := cmd.Flags().GetBool("skip-if-exists")
 		if err != nil {
 			log.Fatal(err)
 		}
 
 		newTarget.Name = args[0]
-		_, err = gFuzzitClient.CreateTarget(newTarget, seed, ifNotExist)
+		_, err = gFuzzitClient.CreateTarget(newTarget, seed, skipIfExists)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -56,5 +56,5 @@ func init() {
 
 	targetCmd.Flags().String("seed", "", "path to .tar.gz seed corpus")
 	targetCmd.Flags().BoolVar(&newTarget.PublicCorpus, "public-corpus", false, "corpus will be publicly readonly (useful for running regression testing on forked PRs primarily at OSS projects )")
-	targetCmd.Flags().Bool("if-not-exists", false, "create target only if the target doesnt exist otherwise return 0")
+	targetCmd.Flags().Bool("skip-if-exists", false, "skip/don't fail if target already exists")
 }
