@@ -39,6 +39,10 @@ var jobCmd = &cobra.Command{
 		if client.HostToDocker[newJob.Host] == "" {
 			log.Fatalf("--host should be one of stretch-llvm8/stretch-llvm9/bionic-swift51. Recieved: %s", newJob.Host)
 		}
+		skipIfNotExist, err := cmd.Flags().GetBool("skip-if-not-exists")
+		if err != nil {
+			log.Fatal(err)
+		}
 
 		log.Println("Creating job...")
 
@@ -53,9 +57,12 @@ var jobCmd = &cobra.Command{
 
 		newJob.TargetId = target
 
-		var err error = nil
 		if newJob.Type == "local-regression" {
 			err = gFuzzitClient.CreateLocalJob(newJob, args[1:])
+			if skipIfNotExist && err.Error() == "401 Unauthorized" {
+				log.Println("Target doesn't exist yet. skipping...")
+				return
+			}
 		} else {
 			_, err = gFuzzitClient.CreateJob(newJob, args[1:])
 		}
@@ -91,4 +98,5 @@ func init() {
 	jobCmd.Flags().StringArrayVarP(&newJob.EnvironmentVariables, "environment", "e", nil,
 		"Additional environment variables for the fuzzer. For example ASAN_OPTINOS, UBSAN_OPTIONS or any other")
 	jobCmd.Flags().StringVar(&newJob.Args, "args", "", "Additional runtime args for the fuzzer")
+	jobCmd.Flags().Bool("skip-if-not-exists", false, "skip/don't fail if target doesnt exists yet. useful for automatic target creation")
 }
