@@ -39,6 +39,7 @@ var jobCmd = &cobra.Command{
 		if client.HostToDocker[newJob.Host] == "" {
 			log.Fatalf("--host should be one of stretch-llvm8/stretch-llvm9/bionic-swift51. Recieved: %s", newJob.Host)
 		}
+
 		log.Println("Creating job...")
 
 		target := args[0]

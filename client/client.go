@@ -12,7 +12,8 @@ import (
 const FuzzitEndpoint = "https://app.fuzzit.dev"
 
 type Target struct {
-	Name string `firestore:"target_name"`
+	Name         string `firestore:"target_name"`
+	PublicCorpus bool   `firestore:"public_corpus"`
 }
 
 type Job struct {

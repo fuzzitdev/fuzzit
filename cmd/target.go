@@ -16,10 +16,13 @@ limitations under the License.
 package cmd
 
 import (
+	"github.com/fuzzitdev/fuzzit/client"
 	"log"
 
 	"github.com/spf13/cobra"
 )
+
+var newTarget = client.Target{}
 
 // targetCmd represents the target command
 var targetCmd = &cobra.Command{
@@ -33,7 +36,14 @@ var targetCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		_, err = gFuzzitClient.CreateTarget(args[0], seed)
+
+		ifNotExist, err := cmd.Flags().GetBool("if-not-exists")
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		newTarget.Name = args[0]
+		_, err = gFuzzitClient.CreateTarget(newTarget, seed, ifNotExist)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -45,4 +55,6 @@ func init() {
 	createCmd.AddCommand(targetCmd)
 
 	targetCmd.Flags().String("seed", "", "path to .tar.gz seed corpus")
+	targetCmd.Flags().BoolVar(&newTarget.PublicCorpus, "public-corpus", false, "corpus will be publicly readonly (useful for running regression testing on forked PRs primarily at OSS projects )")
+	targetCmd.Flags().Bool("if-not-exists", false, "create target only if the target doesnt exist otherwise return 0")
 }

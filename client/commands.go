@@ -5,6 +5,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"io"
 	"io/ioutil"
 	"log"
@@ -149,33 +151,37 @@ func (c *FuzzitClient) GetResource(resource string) error {
 	}
 }
 
-func (c *FuzzitClient) CreateTarget(targetName string, seedPath string) (*firestore.DocumentRef, error) {
+func (c *FuzzitClient) CreateTarget(target Target, seedPath string, isNotExist bool) (*firestore.DocumentRef, error) {
 	err := c.refreshToken()
 	if err != nil {
 		return nil, err
 	}
 
 	re := regexp.MustCompile("^[a-z0-9-]+$")
-	if !re.MatchString(targetName) {
+	if !re.MatchString(target.Name) {
 		return nil, fmt.Errorf("target can only contain lowercase characetrs, numbers and hypens")
 	}
 
 	ctx := context.Background()
-	docRef := c.firestoreClient.Doc("orgs/" + c.Org + "/targets/" + targetName)
+	docRef := c.firestoreClient.Doc("orgs/" + c.Org + "/targets/" + target.Name)
 	_, err = docRef.Get(ctx)
-	if err == nil {
-		return nil, fmt.Errorf("target %s already exist", targetName)
+	if err != nil && grpc.Code(err) != codes.NotFound {
+		return nil, err
+	} else if err == nil && isNotExist {
+		return docRef, nil
+	} else if err == nil && !isNotExist {
+		return nil, fmt.Errorf("target %s already exist", target.Name)
 	}
 
 	if seedPath != "" {
-		storagePath := fmt.Sprintf("orgs/%s/targets/%s/seed", c.Org, targetName)
+		storagePath := fmt.Sprintf("orgs/%s/targets/%s/seed", c.Org, target.Name)
 		err := c.uploadFile(seedPath, storagePath, "seed.tar.gz")
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	_, err = docRef.Set(ctx, Target{Name: targetName})
+	_, err = docRef.Set(ctx, target)
 	if err != nil {
 		return nil, err
 	}
