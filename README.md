@@ -65,26 +65,26 @@ More information can be found in our [docs](https://docs.fuzzit.dev).
 
 ## OSS Projects Using Fuzzit
 * GO
-* [coredns/coredns](http://github.com/coredns/coredns)
-* [prometheus/prometheus](http://github.com/prometheus/prometheus)
-* [grpc-ecosystem/grpc-gateway](https://github.com/grpc-ecosystem/grpc-gateway)
-* [google/syzkaller](http://github.com/google/syzkaller)
-* [google/mtail](https://github.com/google/mtail)
-* [open-policy-agent/opa](https://github.com/open-policy-agent/opa)
-* [dutchcoders/transfer.sh](https://github.com/dutchcoders/transfer.sh)
-* [pelletier/go-toml](https://github.com/pelletier/go-toml)
-* [mvdan/sh](https://github.com/mvdan/sh)
-* [jdkato/prose](https://github.com/jdkato/prose)
-* [klauspost/compress](https://github.com/klauspost/compress)
-* [valyala/fasthttp](https://github.com/valyala/fasthttp)
-* [lucas-clemente/quic-go](https://github.com/lucas-clemente/quic-go)
-* [gomarkdown/markdown](https://github.com/gomarkdown/markdown)
+- [coredns/coredns](http://github.com/coredns/coredns)
+- [prometheus/prometheus](http://github.com/prometheus/prometheus)
+- [grpc-ecosystem/grpc-gateway](https://github.com/grpc-ecosystem/grpc-gateway)
+- [google/syzkaller](http://github.com/google/syzkaller)
+- [google/mtail](https://github.com/google/mtail)
+- [open-policy-agent/opa](https://github.com/open-policy-agent/opa)
+- [dutchcoders/transfer.sh](https://github.com/dutchcoders/transfer.sh)
+- [pelletier/go-toml](https://github.com/pelletier/go-toml)
+- [mvdan/sh](https://github.com/mvdan/sh)
+- [jdkato/prose](https://github.com/jdkato/prose)
+- [klauspost/compress](https://github.com/klauspost/compress)
+- [valyala/fasthttp](https://github.com/valyala/fasthttp)
+- [lucas-clemente/quic-go](https://github.com/lucas-clemente/quic-go)
+- [gomarkdown/markdown](https://github.com/gomarkdown/markdown)
 
 * C/C++ 
-* [systemd/systemd](https://github.com/systemd/systemd)
-* [apache/arrow](https://github.com/apache/arrow)
-* [radare/radare2](https://github.com/radare/radare2)
-* [AndreRenaud/PDFGen](https://github.com/AndreRenaud/PDFGen)
+- [systemd/systemd](https://github.com/systemd/systemd)
+- [apache/arrow](https://github.com/apache/arrow)
+- [radare/radare2](https://github.com/radare/radare2)
+- [AndreRenaud/PDFGen](https://github.com/AndreRenaud/PDFGen)
 
 Use Fuzzit and you don't see your project here open a PR with your project!
 
