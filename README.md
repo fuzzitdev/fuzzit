@@ -63,12 +63,16 @@ Fuzzit currently supports C/C++, Go and Rust
 
 More information can be found in our [docs](https://docs.fuzzit.dev).
 
-## Notable OSS Projects Using Fuzzit
-* [coredns/coredns (Go)](http://github.com/coredns/coredns)
-* [prometheus/prometheus (Go)](http://github.com/prometheus/prometheus)
-* [google/syzkaller (Go)](http://github.com/google/syzkaller)
-* [systemd/systemd (C/C++)](https://github.com/systemd/systemd)
-* [radare/radare2 (C/C++)](https://github.com/radare/radare2) 
+## OSS Projects Using Fuzzit
+* GO
+* [coredns/coredns](http://github.com/coredns/coredns)
+* [prometheus/prometheus](http://github.com/prometheus/prometheus)
+* [grpc-ecosystem/grpc-gateway](https://github.com/grpc-ecosystem/grpc-gateway)
+* [google/syzkaller](http://github.com/google/syzkaller)
+* [open-policy-agent/opa](https://github.com/open-policy-agent/opa)
+* C/C++ 
+* [systemd/systemd](https://github.com/systemd/systemd)
+* [radare/radare2](https://github.com/radare/radare2) 
 
 ## Contribution
 
