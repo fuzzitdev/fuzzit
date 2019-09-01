@@ -12,4 +12,11 @@ RUN ln -s /usr/lib/llvm-9/bin/llvm-symbolizer /bin/llvm-symbolizer
 RUN ln -s /usr/bin/clang-9 /bin/clang
 RUN ln -s /usr/bin/clang++-9 /bin/clang++
 
+RUN mkdir -p /go/src/github.com/dvyukov && \
+    cd /go/src/github.com/dvyukov && \
+    git clone https://github.com/fuzzitdev/go-fuzz && \
+    cd go-fuzz && \
+    go get ./... && \
+    go build ./...
+
 WORKDIR /app
