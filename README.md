@@ -72,6 +72,7 @@ More information can be found in our [docs](https://docs.fuzzit.dev).
 - [google/mtail](https://github.com/google/mtail)
 - [open-policy-agent/opa](https://github.com/open-policy-agent/opa)
 - [dutchcoders/transfer.sh](https://github.com/dutchcoders/transfer.sh)
+- [tsenart/vegeta](https://github.com/tsenart/vegeta)
 - [pelletier/go-toml](https://github.com/pelletier/go-toml)
 - [mvdan/sh](https://github.com/mvdan/sh)
 - [jdkato/prose](https://github.com/jdkato/prose)
