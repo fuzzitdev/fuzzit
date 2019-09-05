@@ -91,6 +91,7 @@ func init() {
 	branch := client.GetValueFromEnv("TRAVIS_BRANCH", "CIRCLE_BRANCH")
 
 	jobCmd.Flags().StringVar(&newJob.Type, "type", "fuzzing", "fuzzing/regression/local-regression")
+	jobCmd.Flags().StringVar(&newJob.Engine, "engine", "libfuzzer", "libfuzzer/jqf")
 	jobCmd.Flags().Uint16Var(&newJob.Parallelism, "cpus", 1, "number of cpus to use (only relevant for fuzzing job)")
 	jobCmd.Flags().StringVar(&newJob.Revision, "revision", revision, "Revision tag of fuzzer (populates automatically from git,travis,circleci)")
 	jobCmd.Flags().StringVar(&newJob.Branch, "branch", branch, "Branch of the fuzzer (populates automatically from git,travis,circleci)")

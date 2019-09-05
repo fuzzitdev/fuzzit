@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/user"
 	"path"
+	"path/filepath"
 )
 
 func getCacheFile() (string, error) {
@@ -64,48 +65,20 @@ func copyFile(dst, src string) (int64, error) {
 	return nBytes, nil
 }
 
-const runSh = `
-#!/bin/sh
-
-mkdir corpus_dir
-mkdir seed_dir
-touch corpus_dir/empty # This to avoid fuzzer stuck
-touch seed_dir/empty # This is to avoid fuzzer stuck
-
-echo "Downloading main corpus from Fuzzit servers..."
-wget -O corpus.tar.gz $CORPUS_LINK || rm -f corpus.tar.gz # remove empty file if corpus doesn't exist
-if test -f "corpus.tar.gz"; then
-    tar -xzf corpus.tar.gz -C corpus_dir
-else
-    echo "corpus is still empty. continuing without..."
-fi
-
-echo "Downloading seed corpus from Fuzzit servers..."
-wget -O seed $SEED_LINK || rm -f seed
-if test -f "seed"; then
-    case $(file --mime-type -b seed) in
-        application/gzip|application/x-gzip)
-           tar -xzf seed -C seed_dir
-        ;;
-        application/zip)
-           unzip seed -d seed_dir
-        ;;
-        *)
-           echo "seed in unknown format. Please upload seed in tar.gz or zip format. If you did and you believe it's
-           a bug, please contact support@fuzzit.dev"
-           exit 1
-           ;;
-    esac
-else
-    echo "seed corpus is empty. continuing without..."
-fi
-
-if test -f "fuzzer"; then
-    chmod a+x fuzzer
-	echo "running regression..."
-    ./fuzzer -exact_artifact_path=./artifact -print_final_stats=1 $(find seed_dir -type f) ./corpus_dir/* $ARGS || exit 1
-else
-    echo "failed to locate fuzzer. does 'fuzzer' executable exist in the archive?"
-	exit 1
-fi
-`
+func listFiles(dst string) ([]string, error) {
+	var fileList []string
+	err := filepath.Walk(dst, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			fmt.Printf("prevent panic by handling failure accessing a path %q: %v\n", path, err)
+			return err
+		}
+		if !info.IsDir() {
+			fileList = append(fileList, path)
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return fileList, nil
+}
