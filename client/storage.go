@@ -4,12 +4,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/h2non/filetype"
+	"github.com/mholt/archiver"
 	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
 	"os"
+	"path/filepath"
 	"time"
 )
 
@@ -74,6 +77,27 @@ func (c *FuzzitClient) uploadFile(filePath string, storagePath string, filename 
 	return nil
 }
 
+func (c *FuzzitClient) archiveAndUpload(dirPath string, storagePath string, filename string) error {
+	dir, err := ioutil.TempDir("", "archiveAndUpload")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer os.RemoveAll(dir) // clean up
+
+	tmpArchiveFileName := filepath.Join(dir, "archive.tar.gz")
+
+	dirArchiver := archiver.NewTarGz()
+	if err = dirArchiver.Archive([]string{dirPath}, tmpArchiveFileName); err != nil {
+		return err
+	}
+
+	if err = c.uploadFile(tmpArchiveFileName, storagePath, filename); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (c *FuzzitClient) downloadFile(filePath string, storagePath string) error {
 	storageLink, err := c.getStorageLink(storagePath, "read")
 	if err != nil {
@@ -96,6 +120,42 @@ func (c *FuzzitClient) downloadFile(filePath string, storagePath string) error {
 	}
 
 	_, err = io.Copy(out, resp.Body)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c *FuzzitClient) downloadAndExtract(dirPath string, storagePath string) error {
+	tmpArchiveFile, err := ioutil.TempFile("", "archive")
+	if err != nil {
+		return err
+	}
+	defer tmpArchiveFile.Close()
+
+	if err := c.downloadFile(tmpArchiveFile.Name(), storagePath); err != nil {
+		return err
+	}
+	buf, _ := ioutil.ReadFile(tmpArchiveFile.Name())
+	kind, _ := filetype.Match(buf)
+	var unarchiver archiver.Unarchiver
+	switch kind.MIME.Value {
+	case "application/gzip":
+		unarchiver = archiver.NewTarGz()
+		break
+	case "application/zip":
+		unarchiver = archiver.NewZip()
+		break
+	default:
+		// assume executable
+		if _, err := copyFile(filepath.Join(dirPath, "fuzzer"), tmpArchiveFile.Name()); err != nil {
+			return err
+		}
+		return nil
+	}
+
+	err = unarchiver.Unarchive(tmpArchiveFile.Name(), dirPath)
 	if err != nil {
 		return err
 	}

@@ -1,7 +1,6 @@
 package client
 
 import (
-	"archive/tar"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -65,6 +64,33 @@ func (c *FuzzitClient) archiveFiles(files []string) (string, error) {
 	}
 
 	return fuzzerPath, nil
+}
+
+func (c *FuzzitClient) DownloadAndExtractCorpus(dst string, target string) error {
+	storagePath := fmt.Sprintf("orgs/%s/targets/%s/corpus.tar.gz", c.Org, target)
+	err := c.downloadAndExtract(dst, storagePath)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *FuzzitClient) DownloadAndExtractSeed(dst string, target string) error {
+	storagePath := fmt.Sprintf("orgs/%s/targets/%s/seed", c.Org, target)
+	err := c.downloadAndExtract(dst, storagePath)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *FuzzitClient) DownloadAndExtractFuzzer(dst string, target string, job string) error {
+	storagePath := fmt.Sprintf("orgs/%s/targets/%s/jobs/%s/fuzzer", c.Org, target, job)
+	err := c.downloadAndExtract(dst, storagePath)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *FuzzitClient) DownloadSeed(dst string, target string) error {
@@ -189,41 +215,6 @@ func (c *FuzzitClient) CreateTarget(target Target, seedPath string, skipIsExists
 	return docRef, nil
 }
 
-func (c *FuzzitClient) getRunShTar() (*os.File, error) {
-	tmpfile, err := ioutil.TempFile("", "run.*.tar")
-	if err != nil {
-		log.Fatal(err)
-	}
-	tw := tar.NewWriter(tmpfile)
-	hdr := &tar.Header{
-		Name: "run.sh",
-		Mode: 0777,
-		Size: int64(len(runSh)),
-	}
-	if err := tw.WriteHeader(hdr); err != nil {
-		return nil, err
-	}
-	if _, err := tw.Write([]byte(runSh)); err != nil {
-		return nil, err
-	}
-	if err := tw.Flush(); err != nil {
-		return nil, err
-	}
-	if err := tw.Close(); err != nil {
-		return nil, err
-	}
-	if err := tmpfile.Close(); err != nil {
-		return nil, err
-	}
-
-	runShTar, err := os.Open(tmpfile.Name())
-	if err != nil {
-		return nil, err
-	}
-
-	return runShTar, nil
-}
-
 func (c *FuzzitClient) CreateLocalJob(jobConfig Job, files []string) error {
 	ctx := context.Background()
 	cli, err := client.NewClientWithOpts(client.FromEnv)
@@ -242,19 +233,6 @@ func (c *FuzzitClient) CreateLocalJob(jobConfig Job, files []string) error {
 		return err
 	}
 
-	corpusPath := fmt.Sprintf("orgs/%s/targets/%s/corpus.tar.gz", c.Org, jobConfig.TargetId)
-	log.Print(corpusPath)
-	corpusLink, err := c.getStorageLink(corpusPath, "read")
-	if err != nil {
-		return err
-	}
-
-	seedPath := fmt.Sprintf("orgs/%s/targets/%s/seed", c.Org, jobConfig.TargetId)
-	seedLink, err := c.getStorageLink(seedPath, "read")
-	if err != nil {
-		return err
-	}
-
 	log.Println("Pulling container")
 	reader, err := cli.ImagePull(ctx, HostToDocker[jobConfig.Host], types.ImagePullOptions{})
 	if err != nil {
@@ -269,14 +247,23 @@ func (c *FuzzitClient) CreateLocalJob(jobConfig Job, files []string) error {
 		&container.Config{
 			Env: append(
 				[]string{
-					"CORPUS_LINK=" + corpusLink,
-					"SEED_LINK=" + seedLink,
 					"ARGS=" + jobConfig.Args,
 					"LD_LIBRARY_PATH=/app",
+					"FUZZIT_API_KEY=" + c.ApiKey,
+					"ORG_ID=" + c.Org,
+					"TARGET_ID=" + jobConfig.TargetId,
 				},
 				jobConfig.EnvironmentVariables...),
-			Image:       HostToDocker[jobConfig.Host],
-			Cmd:         []string{"/bin/sh", "/app/run.sh"},
+			Image: HostToDocker[jobConfig.Host],
+			Cmd: []string{
+				"/bin/sh",
+				"-c",
+				`cd /app
+echo "Downloading fuzzit cli/agent..."
+wget -q -O fuzzit https://github.com/fuzzitdev/fuzzit/releases/download/v2.4.36/fuzzit_Linux_x86_64
+chmod a+x fuzzit
+./fuzzit run --type regression`,
+			},
 			AttachStdin: true,
 		},
 		&container.HostConfig{
@@ -288,18 +275,6 @@ func (c *FuzzitClient) CreateLocalJob(jobConfig Job, files []string) error {
 
 	log.Println("Uploading fuzzer to container")
 	err = cli.CopyToContainer(ctx, createdContainer.ID, "/app", fuzzer, types.CopyToContainerOptions{
-		AllowOverwriteDirWithFile: true,
-	})
-	if err != nil {
-		return err
-	}
-
-	runShTar, err := c.getRunShTar()
-	if err != nil {
-		return err
-	}
-	log.Println("Uploading run.sh to container")
-	err = cli.CopyToContainer(ctx, createdContainer.ID, "/app/", runShTar, types.CopyToContainerOptions{
 		AllowOverwriteDirWithFile: true,
 	})
 	if err != nil {
