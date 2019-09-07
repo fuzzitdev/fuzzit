@@ -17,6 +17,7 @@ const (
 	libFuzzerLeakExitCode    = 76
 	libFuzzerCrashExitCode   = 1
 	libFuzzerOOMExitCode     = -9
+	libFuzzerSuccessExitCode = 0
 
 	fuzzingInterval = 3600
 )
@@ -37,6 +38,8 @@ func libFuzzerExitCodeToStatus(exitCode int) string {
 		status = "crash"
 	case libFuzzerOOMExitCode:
 		status = "oom"
+	case libFuzzerSuccessExitCode:
+		status = "pass"
 	default:
 		status = "failed"
 	}
@@ -229,6 +232,7 @@ func (c *FuzzitClient) runLibFuzzerRegression() error {
 	regressionFiles := append(corpusFiles, seedFiles...)
 	if len(regressionFiles) == 0 {
 		log.Println("no files in corpus and seed. skipping run")
+		c.transitionStatus("pass")
 		return nil
 	}
 
