@@ -27,10 +27,6 @@ var libFuzzerArgs = []string{
 }
 
 func libFuzzerExitCodeToStatus(exitCode int) string {
-	artifactExist := false
-	if _, err := os.Stat("artifact"); err == nil {
-		artifactExist = true
-	}
 	status := "pass"
 	switch exitCode {
 	case libFuzzerTimeoutExitCode:
@@ -41,9 +37,7 @@ func libFuzzerExitCodeToStatus(exitCode int) string {
 		status = "crash"
 	case libFuzzerOOMExitCode:
 		status = "oom"
-	}
-
-	if status == "crash" && !artifactExist {
+	default:
 		status = "failed"
 	}
 
