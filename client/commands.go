@@ -258,11 +258,11 @@ func (c *FuzzitClient) CreateLocalJob(jobConfig Job, files []string) error {
 			Cmd: []string{
 				"/bin/sh",
 				"-c",
-				`cd /app
+				fmt.Sprintf(`cd /app
 echo "Downloading fuzzit cli/agent..."
-wget -q -O fuzzit https://github.com/fuzzitdev/fuzzit/releases/download/v2.4.36/fuzzit_Linux_x86_64
+wget -q -O fuzzit https://github.com/fuzzitdev/fuzzit/releases/download/%s/fuzzit_Linux_x86_64
 chmod a+x fuzzit
-./fuzzit run --type regression`,
+./fuzzit run --type regression`, Version),
 			},
 			AttachStdin: true,
 		},

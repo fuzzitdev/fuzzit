@@ -1,9 +1,11 @@
 package client
 
 import (
+	"bufio"
 	"cloud.google.com/go/firestore"
 	"context"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"os/exec"
@@ -47,6 +49,27 @@ func libFuzzerExitCodeToStatus(exitCode int) string {
 	return status
 }
 
+func appendPrefixToCmd(cmd *exec.Cmd) error {
+	stderr, err := cmd.StderrPipe()
+	if err != nil {
+		return err
+	}
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		return err
+	}
+	go func() {
+		merged := io.MultiReader(stderr, stdout)
+		scanner := bufio.NewScanner(merged)
+		for scanner.Scan() {
+			msg := scanner.Text()
+			fmt.Printf("FUZZER: %s\n", msg)
+		}
+	}()
+
+	return nil
+}
+
 func (c *FuzzitClient) runlibFuzzerMerge() error {
 	if err := os.Mkdir("merge", 0644); err != nil {
 		return err
@@ -69,24 +92,25 @@ func (c *FuzzitClient) runlibFuzzerMerge() error {
 	log.Println("Running merge with: ./fuzzer " + strings.Join(args, " "))
 	cmd := exec.Command("./fuzzer",
 		args...)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	err := cmd.Run()
-	if err != nil {
+	if err := appendPrefixToCmd(cmd); err != nil {
 		return err
 	}
 
-	if err = c.archiveAndUpload("merge",
+	if err := cmd.Run(); err != nil {
+		return err
+	}
+
+	if err := c.archiveAndUpload("merge",
 		fmt.Sprintf("orgs/%s/targets/%s/corpus.tar.gz", c.Org, c.targetId),
 		"corpus.tar.gz"); err != nil {
 		return err
 	}
 
-	if err = os.RemoveAll("corpus"); err != nil {
+	if err := os.RemoveAll("corpus"); err != nil {
 		return err
 	}
 
-	if err = os.Rename("merge", "corpus"); err != nil {
+	if err := os.Rename("merge", "corpus"); err != nil {
 		return err
 	}
 
@@ -144,8 +168,9 @@ func (c *FuzzitClient) runLibFuzzerFuzzing() error {
 		log.Println("Running fuzzing with: ./fuzzer " + strings.Join(args, " "))
 		cmd := exec.Command("./fuzzer",
 			args...)
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
+		if err := appendPrefixToCmd(cmd); err != nil {
+			return err
+		}
 		err = cmd.Start()
 		// Use a channel to signal completion so we can use a select statement
 		done := make(chan error)
@@ -244,8 +269,9 @@ func (c *FuzzitClient) runLibFuzzerRegression() error {
 	log.Println("Running regression...")
 	cmd := exec.Command("./fuzzer",
 		args...)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
+	if err := appendPrefixToCmd(cmd); err != nil {
+		return err
+	}
 
 	exitCode := 0
 	if err := cmd.Run(); err != nil {
