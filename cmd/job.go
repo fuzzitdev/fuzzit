@@ -91,10 +91,10 @@ func init() {
 			revision = revisionHex.String()
 		}
 	} else {
-		revision = client.GetValueFromEnv("TRAVIS_COMMIT", "CIRCLE_SHA1")
+		revision = client.GetValueFromEnv("TRAVIS_COMMIT", "CIRCLE_SHA1", "GITHUB_SHA")
 	}
 
-	branch := client.GetValueFromEnv("TRAVIS_BRANCH", "CIRCLE_BRANCH")
+	branch := client.GetValueFromEnv("TRAVIS_BRANCH", "CIRCLE_BRANCH", "GITHUB_REF")
 
 	jobCmd.Flags().StringVar(&newJob.Type, "type", "fuzzing", "fuzzing/regression/local-regression")
 	jobCmd.Flags().StringVar(&newJob.Engine, "engine", "libfuzzer", "libfuzzer/jqf")
