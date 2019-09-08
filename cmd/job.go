@@ -36,9 +36,15 @@ var jobCmd = &cobra.Command{
 		if newJob.Type != "fuzzing" && newJob.Type != "regression" && newJob.Type != "local-regression" {
 			log.Fatalf("--type should be either fuzzing, regression or local-regression. Recieved: %s", newJob.Type)
 		}
+
+		if newJob.Engine != "libfuzzer" && newJob.Engine != "jqf" {
+			log.Fatalf("--engine should be either libfuzzer or jqf. Recieved: %s", newJob.Type)
+		}
+
 		if client.HostToDocker[newJob.Host] == "" {
 			log.Fatalf("--host should be one of stretch-llvm8/stretch-llvm9/bionic-swift51. Recieved: %s", newJob.Host)
 		}
+
 		skipIfNotExist, err := cmd.Flags().GetBool("skip-if-not-exists")
 		if err != nil {
 			log.Fatal(err)

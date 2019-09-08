@@ -322,13 +322,11 @@ func (c *FuzzitClient) transitionStatus(status string) error {
 	return nil
 }
 
-func (c *FuzzitClient) RunJob(targetId string, jobId string, updateDB bool, fuzzingType string) error {
+func (c *FuzzitClient) RunLibFuzzer(targetId string, jobId string, updateDB bool, fuzzingType string) error {
 	err := c.refreshToken()
 	c.targetId = targetId
 	c.jobId = jobId
 	c.updateDB = updateDB
-
-	log.SetPrefix("AGENT: ")
 
 	if err = c.transitionToInProgress(); err != nil {
 		return err
