@@ -100,6 +100,7 @@ func (c *FuzzitClient) runlibFuzzerMerge() error {
 		return err
 	}
 
+	c.refreshToken()
 	if err := c.archiveAndUpload("merge",
 		fmt.Sprintf("orgs/%s/targets/%s/corpus.tar.gz", c.Org, c.targetId),
 		"corpus.tar.gz"); err != nil {
@@ -181,6 +182,7 @@ func (c *FuzzitClient) runLibFuzzerFuzzing() error {
 			select {
 			case <-timeout:
 				var fuzzingJob job
+				c.refreshToken()
 				docRef := c.firestoreClient.Doc(fmt.Sprintf("orgs/%s/targets/%s/jobs/%s", c.Org, c.targetId, c.jobId))
 				if docRef == nil {
 					return fmt.Errorf("invalid resource")
@@ -228,6 +230,7 @@ func (c *FuzzitClient) runLibFuzzerFuzzing() error {
 		}
 	}
 
+	c.refreshToken()
 	err = c.uploadCrash(exitCode)
 	if err != nil {
 		return err
