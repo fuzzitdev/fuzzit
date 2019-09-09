@@ -71,6 +71,15 @@ func appendPrefixToCmd(cmd *exec.Cmd) error {
 }
 
 func (c *FuzzitClient) runlibFuzzerMerge() error {
+	isEmpty, err := IsDirEmpty("corpus")
+	if err != nil {
+		return err
+	}
+	if isEmpty {
+		log.Println("nothing to merge. skipping...")
+		return nil
+	}
+
 	if err := os.Mkdir("merge", 0644); err != nil {
 		return err
 	}
