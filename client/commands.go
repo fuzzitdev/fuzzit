@@ -121,7 +121,7 @@ func (c *FuzzitClient) DownloadFuzzer(dst string, target string, job string) err
 }
 
 func (c *FuzzitClient) GetResource(resource string) error {
-	err := c.refreshToken()
+	err := c.refreshToken(false)
 	if err != nil {
 		return err
 	}
@@ -178,7 +178,7 @@ func (c *FuzzitClient) GetResource(resource string) error {
 }
 
 func (c *FuzzitClient) CreateTarget(target Target, seedPath string, skipIsExists bool) (*firestore.DocumentRef, error) {
-	err := c.refreshToken()
+	err := c.refreshToken(false)
 	if err != nil {
 		return nil, err
 	}
@@ -322,7 +322,7 @@ chmod a+x fuzzit
 }
 
 func (c *FuzzitClient) CreateJob(jobConfig Job, files []string) (*firestore.DocumentRef, error) {
-	err := c.refreshToken()
+	err := c.refreshToken(false)
 	if err != nil {
 		return nil, err
 	}

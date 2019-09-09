@@ -15,8 +15,8 @@ import (
 	"google.golang.org/api/option"
 )
 
-func (c *FuzzitClient) refreshToken() error {
-	if c.IdToken == "" || (time.Now().Unix()-c.LastRefresh) > 60*45 {
+func (c *FuzzitClient) refreshToken(force bool) error {
+	if c.IdToken == "" || (time.Now().Unix()-c.LastRefresh) > 60*45 || force {
 		createCustomTokenEndpoint := fmt.Sprintf("%s/createCustomToken?api_key=%s", FuzzitEndpoint, url.QueryEscape(c.ApiKey))
 		r, err := c.httpClient.Get(createCustomTokenEndpoint)
 		if err != nil {

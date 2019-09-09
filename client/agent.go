@@ -109,7 +109,9 @@ func (c *FuzzitClient) runlibFuzzerMerge() error {
 		return err
 	}
 
-	c.refreshToken()
+	if err := c.refreshToken(true); err != nil {
+		return err
+	}
 	if err := c.archiveAndUpload("merge",
 		fmt.Sprintf("orgs/%s/targets/%s/corpus.tar.gz", c.Org, c.targetId),
 		"corpus.tar.gz"); err != nil {
@@ -191,7 +193,9 @@ func (c *FuzzitClient) runLibFuzzerFuzzing() error {
 			select {
 			case <-timeout:
 				var fuzzingJob job
-				c.refreshToken()
+				if err := c.refreshToken(true); err != nil {
+					return err
+				}
 				docRef := c.firestoreClient.Doc(fmt.Sprintf("orgs/%s/targets/%s/jobs/%s", c.Org, c.targetId, c.jobId))
 				if docRef == nil {
 					return fmt.Errorf("invalid resource")
@@ -239,7 +243,9 @@ func (c *FuzzitClient) runLibFuzzerFuzzing() error {
 		}
 	}
 
-	c.refreshToken()
+	if err := c.refreshToken(true); err != nil {
+		return err
+	}
 	err = c.uploadCrash(exitCode)
 	if err != nil {
 		return err
@@ -361,19 +367,22 @@ func (c *FuzzitClient) transitionStatus(status string) error {
 }
 
 func (c *FuzzitClient) RunLibFuzzer(targetId string, jobId string, updateDB bool, fuzzingType string) error {
-	err := c.refreshToken()
+	if err := c.refreshToken(true); err != nil {
+		return err
+	}
+
 	c.targetId = targetId
 	c.jobId = jobId
 	c.updateDB = updateDB
 
-	if err = c.transitionToInProgress(); err != nil {
+	if err := c.transitionToInProgress(); err != nil {
 		return err
 	}
 
-	if err = os.Mkdir("corpus", 0644); err != nil {
+	if err := os.Mkdir("corpus", 0644); err != nil {
 		return err
 	}
-	if err = os.Mkdir("seed", 0644); err != nil {
+	if err := os.Mkdir("seed", 0644); err != nil {
 		return err
 	}
 
@@ -411,6 +420,7 @@ func (c *FuzzitClient) RunLibFuzzer(targetId string, jobId string, updateDB bool
 		}
 	}
 
+	var err error
 	if fuzzingType == "regression" {
 		err = c.runLibFuzzerRegression()
 	} else {

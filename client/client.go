@@ -10,7 +10,7 @@ import (
 )
 
 const FuzzitEndpoint = "https://app.fuzzit.dev"
-const Version = "v2.4.43"
+const Version = "v2.4.44"
 
 type Target struct {
 	Name         string `firestore:"target_name"`
@@ -73,7 +73,7 @@ func NewFuzzitClient(apiKey string) (*FuzzitClient, error) {
 	c := &FuzzitClient{}
 	c.httpClient = &http.Client{Timeout: 60 * time.Second}
 	c.ApiKey = apiKey
-	err := c.refreshToken()
+	err := c.refreshToken(false)
 	if err != nil {
 		return nil, err
 	}
