@@ -143,10 +143,8 @@ func (c *FuzzitClient) downloadAndExtract(dirPath string, storagePath string) er
 	switch kind.MIME.Value {
 	case "application/gzip":
 		unarchiver = archiver.NewTarGz()
-		break
 	case "application/zip":
 		unarchiver = archiver.NewZip()
-		break
 	default:
 		// assume executable
 		if _, err := copyFile(filepath.Join(dirPath, "fuzzer"), tmpArchiveFile.Name()); err != nil {
@@ -155,8 +153,7 @@ func (c *FuzzitClient) downloadAndExtract(dirPath string, storagePath string) er
 		return nil
 	}
 
-	err = unarchiver.Unarchive(tmpArchiveFile.Name(), dirPath)
-	if err != nil {
+	if err := unarchiver.Unarchive(tmpArchiveFile.Name(), dirPath); err != nil {
 		return err
 	}
 

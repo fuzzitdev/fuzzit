@@ -88,7 +88,7 @@ func (c *FuzzitClient) runlibFuzzerMerge() error {
 			return err
 		}
 	}
-	args := append([]string{
+	args := []string{
 		"-print_final_stats=1",
 		"-exact_artifact_path=./artifact",
 		fmt.Sprintf("-error_exitcode=%d", libFuzzerTimeoutExitCode),
@@ -96,7 +96,7 @@ func (c *FuzzitClient) runlibFuzzerMerge() error {
 		"-merge=1",
 		"merge",
 		"corpus",
-	})
+	}
 
 	log.Println("Running merge with: ./fuzzer " + strings.Join(args, " "))
 	cmd := exec.Command("./fuzzer",
@@ -164,14 +164,14 @@ func (c *FuzzitClient) uploadCrash(exitCode int) error {
 func (c *FuzzitClient) runLibFuzzerFuzzing() error {
 	ctx := context.Background()
 
-	args := append([]string{
+	args := []string{
 		"-print_final_stats=1",
 		"-exact_artifact_path=./artifact",
 		"-error_exitcode=76",
 		"-max_total_time=3600",
 		"corpus",
 		"seed",
-	})
+	}
 
 	var err error
 	err = nil
@@ -189,7 +189,7 @@ func (c *FuzzitClient) runLibFuzzerFuzzing() error {
 		go func() { done <- cmd.Wait() }()
 		timeout := time.After(60 * time.Second)
 		stopSession := false
-		for stopSession == false {
+		for !stopSession {
 			select {
 			case <-timeout:
 				var fuzzingJob job
