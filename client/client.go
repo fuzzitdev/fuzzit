@@ -10,7 +10,7 @@ import (
 )
 
 const FuzzitEndpoint = "https://app.fuzzit.dev"
-const Version = "v2.4.44"
+const Version = "v2.4.45"
 
 type Target struct {
 	Name         string `firestore:"target_name"`
@@ -67,6 +67,12 @@ type FuzzitClient struct {
 	targetId        string // this is mainly used by the agent
 	jobId           string // this is mainly used by the agent
 	updateDB        bool   // this is mainly used by the agent
+}
+
+func NewUnAuthenticatedClient() *FuzzitClient {
+	c := &FuzzitClient{}
+	c.httpClient = &http.Client{Timeout: 60 * time.Second}
+	return c
 }
 
 func NewFuzzitClient(apiKey string) (*FuzzitClient, error) {

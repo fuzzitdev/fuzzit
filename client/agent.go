@@ -367,8 +367,10 @@ func (c *FuzzitClient) transitionStatus(status string) error {
 }
 
 func (c *FuzzitClient) RunLibFuzzer(targetId string, jobId string, updateDB bool, fuzzingType string) error {
-	if err := c.refreshToken(true); err != nil {
-		return err
+	if updateDB {
+		if err := c.refreshToken(true); err != nil {
+			return err
+		}
 	}
 
 	c.targetId = targetId

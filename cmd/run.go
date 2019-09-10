@@ -32,19 +32,21 @@ var runCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(0),
 	Run: func(cmd *cobra.Command, args []string) {
 		apiKey := viper.GetString("api-key")
-		gFuzzitClient, err := client.NewFuzzitClient(apiKey)
+		gFuzzitClient := client.NewUnAuthenticatedClient()
+		updateDB, err := cmd.Flags().GetBool("update-db")
 		if err != nil {
-			log.Fatalln(err)
+			log.Fatal(err)
+		}
+		if updateDB {
+			gFuzzitClient, err = client.NewFuzzitClient(apiKey)
+			if err != nil {
+				log.Fatalln(err)
+			}
 		}
 
 		fuzzingType, err := cmd.Flags().GetString("type")
 		if err != nil {
 			log.Fatalln(err)
-		}
-
-		updateDB, err := cmd.Flags().GetBool("update-db")
-		if err != nil {
-			log.Fatal(err)
 		}
 
 		orgId := os.Getenv("ORG_ID")
