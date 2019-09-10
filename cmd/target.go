@@ -16,7 +16,7 @@ limitations under the License.
 package cmd
 
 import (
-	"github.com/fuzzitdev/fuzzit/client"
+	"github.com/fuzzitdev/fuzzit/v2/client"
 	"log"
 
 	"github.com/spf13/cobra"

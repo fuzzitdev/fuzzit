@@ -21,7 +21,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/fuzzitdev/fuzzit/client"
+	"github.com/fuzzitdev/fuzzit/v2/client"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )

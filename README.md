@@ -22,12 +22,12 @@ or via
 wget https://github.com/fuzzitdev/fuzzit/releases/download/<version>/fuzzit_<version>_<os>_<arch>
 ```
 
-#### Go Get
+#### Go get
 
-Also, you can use the following command to download and compile (This usually takes some time so, it's usually faster to either download a pre-compiled release or download the source and build locally):
+You can also use Go 1.12 or later to build the latest stable version from source:
 
 ```bash
-go get -v -u github.com/fuzzitdev/fuzzit
+GO111MODULE=on go get github.com/fuzzitdev/fuzzit/v2
 ```
 
 #### Homebrew Tap

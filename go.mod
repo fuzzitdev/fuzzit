@@ -1,4 +1,4 @@
-module github.com/fuzzitdev/fuzzit
+module github.com/fuzzitdev/fuzzit/v2
 
 go 1.12
 

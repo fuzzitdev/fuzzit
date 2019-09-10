@@ -19,7 +19,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/fuzzitdev/fuzzit/client"
+	"github.com/fuzzitdev/fuzzit/v2/client"
 	"github.com/spf13/cobra"
 )
 
