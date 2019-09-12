@@ -13,6 +13,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -115,8 +116,14 @@ func (c *FuzzitClient) downloadFile(filePath string, storagePath string) error {
 		return err
 	}
 	defer resp.Body.Close()
+
 	if resp.StatusCode != 200 {
 		return errors.New(resp.Status)
+	}
+
+	split := strings.Split(resp.Header.Get("Content-Disposition"), "filename=")
+	if len(split) == 2 {
+		c.fuzzerFilename = split[1]
 	}
 
 	_, err = io.Copy(out, resp.Body)
@@ -138,19 +145,33 @@ func (c *FuzzitClient) downloadAndExtract(dirPath string, storagePath string) er
 		return err
 	}
 	buf, _ := ioutil.ReadFile(tmpArchiveFile.Name())
-	kind, _ := filetype.Match(buf)
+
 	var unarchiver archiver.Unarchiver
-	switch kind.MIME.Value {
-	case "application/gzip":
-		unarchiver = archiver.NewTarGz()
-	case "application/zip":
-		unarchiver = archiver.NewZip()
-	default:
-		// assume executable
-		if _, err := copyFile(filepath.Join(dirPath, "fuzzer"), tmpArchiveFile.Name()); err != nil {
+
+	// Try by filename fist
+	if strings.HasSuffix(c.fuzzerFilename, ".jar") {
+		if _, err := copyFile(filepath.Join(dirPath, "fuzzer.jar"), tmpArchiveFile.Name()); err != nil {
 			return err
 		}
 		return nil
+	} else if strings.HasSuffix(c.fuzzerFilename, ".tar.gz") {
+		unarchiver = archiver.NewTarGz()
+	} else if strings.HasSuffix(c.fuzzerFilename, ".zip") {
+		unarchiver = archiver.NewZip()
+	} else {
+		kind, _ := filetype.Match(buf)
+		switch kind.MIME.Value {
+		case "application/gzip":
+			unarchiver = archiver.NewTarGz()
+		case "application/zip":
+			unarchiver = archiver.NewZip()
+		default:
+			// assume executable
+			if _, err := copyFile(filepath.Join(dirPath, "fuzzer"), tmpArchiveFile.Name()); err != nil {
+				return err
+			}
+			return nil
+		}
 	}
 
 	if err := unarchiver.Unarchive(tmpArchiveFile.Name(), dirPath); err != nil {

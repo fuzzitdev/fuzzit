@@ -24,11 +24,6 @@ const (
 	fuzzingInterval = 3600
 )
 
-var libFuzzerArgs = []string{
-	"-print_final_stats=1",
-	"-exact_artifact_path=./artifact",
-}
-
 func libFuzzerExitCodeToStatus(exitCode int) string {
 	status := "pass"
 	switch exitCode {
@@ -366,7 +361,108 @@ func (c *FuzzitClient) transitionStatus(status string) error {
 	return nil
 }
 
-func (c *FuzzitClient) RunLibFuzzer(targetId string, jobId string, updateDB bool, fuzzingType string) error {
+func (c *FuzzitClient) RunJQFFuzzing() error {
+	ctx := context.Background()
+
+	args := []string{
+		"-Djqf.ei.EXIT_ON_CRASH=true",
+		"-Djqf.ei.LIBFUZZER_COMPAT_OUTPUT=true",
+		"-Djqf.ei.TIMEOUT=3600000",
+		"-jar",
+		"fuzzer.jar",
+	}
+	args = append(args, strings.Split(c.currentJob.Args, " ")...)
+	path, err := exec.LookPath("java")
+	if err != nil {
+		return fmt.Errorf("java must be installed in the docker to run JQF fuzzer")
+	}
+
+	var exitCode int
+	for err == nil {
+		log.Println(err)
+		log.Println("Running fuzzing with: java -jar fuzzer.jar corpus seed")
+		cmd := exec.Command(path,
+			args...)
+		if err := appendPrefixToCmd(cmd); err != nil {
+			return err
+		}
+		err = cmd.Start()
+		// Use a channel to signal completion so we can use a select statement
+		done := make(chan error)
+		go func() { done <- cmd.Wait() }()
+		timeout := time.After(60 * time.Second)
+		stopSession := false
+		for !stopSession {
+			select {
+			case <-timeout:
+				var fuzzingJob job
+				if err := c.refreshToken(); err != nil {
+					return err
+				}
+				docRef := c.firestoreClient.Doc(fmt.Sprintf("orgs/%s/targets/%s/jobs/%s", c.Org, c.targetId, c.jobId))
+				if docRef == nil {
+					return fmt.Errorf("invalid resource")
+				}
+				docsnap, err := docRef.Get(ctx)
+				if err != nil {
+					return err
+				}
+				err = docsnap.DataTo(&fuzzingJob)
+				if err != nil {
+					return err
+				}
+				if fuzzingJob.Status == "in progress" {
+					timeout = time.After(60 * time.Second)
+				} else {
+					log.Println("job was cancel by user. exiting...")
+					cmd.Process.Kill()
+					return nil
+				}
+			case err = <-done:
+				stopSession = true
+				if err != nil {
+					log.Printf("process finished with error = %v\n", err)
+					if exiterr, ok := err.(*exec.ExitError); ok {
+						// The program has exited with an exit code != 0
+
+						// This works on both Unix and Windows. Although package
+						// syscall is generally platform dependent, WaitStatus is
+						// defined for both Unix and Windows and in both cases has
+						// an ExitStatus() method with the same signature.
+						if status, ok := exiterr.Sys().(syscall.WaitStatus); ok {
+							exitCode = status.ExitStatus()
+							log.Printf("Exit Status: %d", status.ExitStatus())
+						}
+					} else {
+						return err
+					}
+				} else {
+					if err = c.runlibFuzzerMerge(); err != nil {
+						return err
+					}
+					log.Print("process finished successfully")
+				}
+			}
+		}
+	}
+
+	if err := c.refreshToken(); err != nil {
+		return err
+	}
+	err = c.uploadCrash(exitCode)
+	if err != nil {
+		return err
+	}
+
+	err = c.transitionStatus(libFuzzerExitCodeToStatus(exitCode))
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c *FuzzitClient) RunFuzzer(targetId string, jobId string, updateDB bool, fuzzingType string) error {
 	if c.ApiKey != "" {
 		if err := c.refreshToken(); err != nil {
 			return err
@@ -395,13 +491,16 @@ func (c *FuzzitClient) RunLibFuzzer(targetId string, jobId string, updateDB bool
 		}
 	}
 
-	if _, err := os.Stat("fuzzer"); os.IsNotExist(err) {
+	if _, err := os.Stat("fuzzer"); err == nil {
+		c.engine = libFuzzerEngine
+		if err := os.Chmod("./fuzzer", 0770); err != nil {
+			return err
+		}
+	} else if _, err := os.Stat("fuzzer.jar"); err == nil {
+		c.engine = JQFEngine
+	} else {
 		c.transitionStatus("failed")
-		return fmt.Errorf("fuzzer executable doesnt exist")
-	}
-
-	if err := os.Chmod("./fuzzer", 0770); err != nil {
-		return err
+		return fmt.Errorf("either fuzzer executable should exist or JQF .jar")
 	}
 
 	log.Println("downloading corpus")
@@ -423,10 +522,14 @@ func (c *FuzzitClient) RunLibFuzzer(targetId string, jobId string, updateDB bool
 	}
 
 	var err error
-	if fuzzingType == "regression" {
-		err = c.runLibFuzzerRegression()
+	if c.engine == JQFEngine {
+		err = c.RunJQFFuzzing()
 	} else {
-		err = c.runLibFuzzerFuzzing()
+		if fuzzingType == "regression" {
+			err = c.runLibFuzzerRegression()
+		} else {
+			err = c.runLibFuzzerFuzzing()
+		}
 	}
 
 	if err != nil {

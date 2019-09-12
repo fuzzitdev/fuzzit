@@ -75,17 +75,17 @@ func TestCreateLocalJob(t *testing.T) {
 		{unAuthenticatedClient, "empty-corpus", ""},
 		{unAuthenticatedClient, "auth-required", "fuzzer exited with 1"},
 
-		{authenticatedClient, "invalid-target", "fuzzer exited with 1"},
+		{authenticatedClient, "invalid-target", ""},
 		{authenticatedClient, "parse-complex", ""},
 		{authenticatedClient, "empty-corpus", ""},
 		{authenticatedClient, "auth-required", ""},
 	}
 
 	for _, tc := range testCases {
-		t.Run(fmt.Sprintf("no-auth: target:%s, err:%s", tc.target, tc.err), func(t *testing.T) {
+		t.Run(fmt.Sprintf("target:%s, err:%s", tc.target, tc.err), func(t *testing.T) {
 			newJob.Type = "regression"
 			newJob.TargetId = tc.target
-			err := unAuthenticatedClient.CreateLocalJob(newJob, []string{"testdata/fuzzer.tar.gz"})
+			err := tc.client.CreateLocalJob(newJob, []string{"testdata/fuzzer.tar.gz"})
 			if err != nil {
 				if err.Error() != tc.err {
 					t.Errorf("was expecting %s recieved %s", tc.err, err.Error())

@@ -10,6 +10,11 @@ import (
 const FuzzitEndpoint = "https://app.fuzzit.dev"
 const Version = "v2.4.47"
 
+const (
+	libFuzzerEngine = "libFuzzerEngine"
+	JQFEngine       = "JQF"
+)
+
 type Target struct {
 	Name         string `firestore:"target_name"`
 	PublicCorpus bool   `firestore:"public_corpus"`
@@ -65,17 +70,19 @@ type FuzzitClient struct {
 	targetId        string // this is mainly used by the agent
 	jobId           string // this is mainly used by the agent
 	updateDB        bool   // this is mainly used by the agent
+	fuzzerFilename  string // this is mainly used by the agent
+	engine          string
 }
 
 func NewUnAuthenticatedClient() *FuzzitClient {
 	c := &FuzzitClient{}
-	c.httpClient = &http.Client{Timeout: 60 * time.Second}
+	c.httpClient = &http.Client{Timeout: 120 * time.Second}
 	return c
 }
 
 func NewFuzzitClient(apiKey string) (*FuzzitClient, error) {
 	c := &FuzzitClient{}
-	c.httpClient = &http.Client{Timeout: 60 * time.Second}
+	c.httpClient = &http.Client{Timeout: 120 * time.Second}
 	c.ApiKey = apiKey
 	err := c.refreshToken()
 	if err != nil {

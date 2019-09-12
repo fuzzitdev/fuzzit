@@ -58,7 +58,7 @@ var runCmd = &cobra.Command{
 		}
 
 		gFuzzitClient.Org = orgId
-		err = gFuzzitClient.RunLibFuzzer(targetId, jobId, updateDB, fuzzingType)
+		err = gFuzzitClient.RunFuzzer(targetId, jobId, updateDB, fuzzingType)
 
 		if err != nil {
 			log.Fatalln(err)
