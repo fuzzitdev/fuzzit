@@ -16,32 +16,13 @@ limitations under the License.
 package cmd
 
 import (
-	"log"
-
-	"github.com/fuzzitdev/fuzzit/v2/client"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 // createCmd represents the create command
 var createCmd = &cobra.Command{
 	Use:   "create",
 	Short: "Create a new Target or a Job",
-	PersistentPreRun: func(cmd *cobra.Command, args []string) {
-		apiKey := viper.GetString("api-key")
-		var err error
-		if apiKey != "" {
-			gFuzzitClient, err = client.NewFuzzitClient(apiKey)
-			if err != nil {
-				log.Fatalln(err)
-			}
-		} else {
-			gFuzzitClient, err = client.LoadFuzzitFromCache()
-			if err != nil {
-				log.Fatalln(err)
-			}
-		}
-	},
 }
 
 func init() {

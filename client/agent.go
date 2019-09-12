@@ -109,7 +109,7 @@ func (c *FuzzitClient) runlibFuzzerMerge() error {
 		return err
 	}
 
-	if err := c.refreshToken(true); err != nil {
+	if err := c.refreshToken(); err != nil {
 		return err
 	}
 	if err := c.archiveAndUpload("merge",
@@ -193,7 +193,7 @@ func (c *FuzzitClient) runLibFuzzerFuzzing() error {
 			select {
 			case <-timeout:
 				var fuzzingJob job
-				if err := c.refreshToken(true); err != nil {
+				if err := c.refreshToken(); err != nil {
 					return err
 				}
 				docRef := c.firestoreClient.Doc(fmt.Sprintf("orgs/%s/targets/%s/jobs/%s", c.Org, c.targetId, c.jobId))
@@ -243,7 +243,7 @@ func (c *FuzzitClient) runLibFuzzerFuzzing() error {
 		}
 	}
 
-	if err := c.refreshToken(true); err != nil {
+	if err := c.refreshToken(); err != nil {
 		return err
 	}
 	err = c.uploadCrash(exitCode)
@@ -367,8 +367,8 @@ func (c *FuzzitClient) transitionStatus(status string) error {
 }
 
 func (c *FuzzitClient) RunLibFuzzer(targetId string, jobId string, updateDB bool, fuzzingType string) error {
-	if updateDB {
-		if err := c.refreshToken(true); err != nil {
+	if c.ApiKey != "" {
+		if err := c.refreshToken(); err != nil {
 			return err
 		}
 	}

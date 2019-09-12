@@ -18,9 +18,7 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/fuzzitdev/fuzzit/v2/client"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"log"
 	"os"
 )
@@ -31,17 +29,9 @@ var runCmd = &cobra.Command{
 	Short: "Run job locally (used by the agent)",
 	Args:  cobra.ExactArgs(0),
 	Run: func(cmd *cobra.Command, args []string) {
-		apiKey := viper.GetString("api-key")
-		gFuzzitClient := client.NewUnAuthenticatedClient()
 		updateDB, err := cmd.Flags().GetBool("update-db")
 		if err != nil {
 			log.Fatal(err)
-		}
-		if updateDB {
-			gFuzzitClient, err = client.NewFuzzitClient(apiKey)
-			if err != nil {
-				log.Fatalln(err)
-			}
 		}
 
 		fuzzingType, err := cmd.Flags().GetString("type")

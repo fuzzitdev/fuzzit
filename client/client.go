@@ -1,9 +1,7 @@
 package client
 
 import (
-	"encoding/json"
 	"net/http"
-	"os"
 	"time"
 
 	"cloud.google.com/go/firestore"
@@ -79,43 +77,9 @@ func NewFuzzitClient(apiKey string) (*FuzzitClient, error) {
 	c := &FuzzitClient{}
 	c.httpClient = &http.Client{Timeout: 60 * time.Second}
 	c.ApiKey = apiKey
-	err := c.refreshToken(false)
+	err := c.refreshToken()
 	if err != nil {
 		return nil, err
 	}
-	return c, nil
-}
-
-func LoadFuzzitFromCache() (*FuzzitClient, error) {
-	c := &FuzzitClient{}
-	c.httpClient = &http.Client{Timeout: 60 * time.Second}
-
-	cacheFile, err := getCacheFile()
-	if err != nil {
-		return nil, err
-	}
-
-	if _, err := os.Stat(cacheFile); os.IsNotExist(err) {
-		return c, nil
-	}
-
-	file, err := os.Open(cacheFile)
-	if err != nil {
-		return nil, err
-	}
-
-	err = json.NewDecoder(file).Decode(c)
-	file.Close()
-	if err != nil {
-		// try to prevent being stuck forever if cache file gets corrupted
-		os.Remove(cacheFile)    // if a file
-		os.RemoveAll(cacheFile) // if a directory
-		return nil, err
-	}
-
-	// if c.ApiKey == "" {
-	//	return errors.New("API Key is not configured (will have access only to public repositories)")
-	//}
-
 	return c, nil
 }

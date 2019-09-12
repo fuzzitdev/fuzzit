@@ -32,6 +32,18 @@ var rootCmd = &cobra.Command{
 	Use:     "fuzzit",
 	Short:   "Continuous fuzzing made simple CLI",
 	Version: client.Version,
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		apiKey := viper.GetString("api-key")
+		var err error
+		if apiKey != "" {
+			gFuzzitClient, err = client.NewFuzzitClient(apiKey)
+			if err != nil {
+				log.Fatalln(err)
+			}
+		} else {
+			gFuzzitClient = client.NewUnAuthenticatedClient()
+		}
+	},
 }
 
 func Execute() {

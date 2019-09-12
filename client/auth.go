@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"net/url"
 	"time"
 
@@ -15,51 +14,34 @@ import (
 	"google.golang.org/api/option"
 )
 
-func (c *FuzzitClient) refreshToken(force bool) error {
-	if c.IdToken == "" || (time.Now().Unix()-c.LastRefresh) > 60*45 || force {
-		createCustomTokenEndpoint := fmt.Sprintf("%s/createCustomToken?api_key=%s", FuzzitEndpoint, url.QueryEscape(c.ApiKey))
-		r, err := c.httpClient.Get(createCustomTokenEndpoint)
-		if err != nil {
-			return err
-		}
-		defer r.Body.Close()
-		if r.StatusCode != 200 {
-			return errors.New("Please set env variable FUZZIT_API_KEY or pass --api-key. API Key for you account: https://app.fuzzit.dev/settings")
-		}
+func (c *FuzzitClient) refreshToken() error {
+	createCustomTokenEndpoint := fmt.Sprintf("%s/createCustomToken?api_key=%s", FuzzitEndpoint, url.QueryEscape(c.ApiKey))
+	r, err := c.httpClient.Get(createCustomTokenEndpoint)
+	if err != nil {
+		return err
+	}
+	defer r.Body.Close()
+	if r.StatusCode != 200 {
+		return errors.New("please set env variable FUZZIT_API_KEY or pass --api-key. API Key for you account: https://app.fuzzit.dev/settings")
+	}
 
-		err = json.NewDecoder(r.Body).Decode(c)
-		if err != nil {
-			return err
-		}
+	err = json.NewDecoder(r.Body).Decode(c)
+	if err != nil {
+		return err
+	}
 
-		r, err = c.httpClient.Post(
-			"https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyCustomToken?key=AIzaSyCs_Sm1VOKZwJZmTXdOCvs1wyn91vYMNSY",
-			"application/json",
-			bytes.NewBufferString(fmt.Sprintf(`{"token": "%s", "returnSecureToken": true}`, c.CustomToken)))
-		if err != nil {
-			return err
-		}
-		defer r.Body.Close()
+	r, err = c.httpClient.Post(
+		"https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyCustomToken?key=AIzaSyCs_Sm1VOKZwJZmTXdOCvs1wyn91vYMNSY",
+		"application/json",
+		bytes.NewBufferString(fmt.Sprintf(`{"token": "%s", "returnSecureToken": true}`, c.CustomToken)))
+	if err != nil {
+		return err
+	}
+	defer r.Body.Close()
 
-		err = json.NewDecoder(r.Body).Decode(c)
-		if err != nil {
-			return nil
-		}
-		c.LastRefresh = time.Now().Unix()
-
-		cBytes, err := json.MarshalIndent(c, "", "")
-		if err != nil {
-			return err
-		}
-
-		cacheFile, err := getCacheFile()
-		if err != nil {
-			return err
-		}
-		err = ioutil.WriteFile(cacheFile, cBytes, 0644)
-		if err != nil {
-			return err
-		}
+	err = json.NewDecoder(r.Body).Decode(c)
+	if err != nil {
+		return nil
 	}
 
 	token := oauth2.Token{

@@ -93,35 +93,8 @@ func (c *FuzzitClient) DownloadAndExtractFuzzer(dst string, target string, job s
 	return nil
 }
 
-func (c *FuzzitClient) DownloadSeed(dst string, target string) error {
-	storagePath := fmt.Sprintf("orgs/%s/targets/%s/seed", c.Org, target)
-	err := c.downloadFile(dst, storagePath)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (c *FuzzitClient) DownloadCorpus(dst string, target string) error {
-	storagePath := fmt.Sprintf("orgs/%s/targets/%s/corpus.tar.gz", c.Org, target)
-	err := c.downloadFile(dst, storagePath)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (c *FuzzitClient) DownloadFuzzer(dst string, target string, job string) error {
-	storagePath := fmt.Sprintf("orgs/%s/targets/%s/jobs/%s/fuzzer", c.Org, target, job)
-	err := c.downloadFile(dst, storagePath)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 func (c *FuzzitClient) GetResource(resource string) error {
-	err := c.refreshToken(false)
+	err := c.refreshToken()
 	if err != nil {
 		return err
 	}
@@ -178,7 +151,7 @@ func (c *FuzzitClient) GetResource(resource string) error {
 }
 
 func (c *FuzzitClient) CreateTarget(target Target, seedPath string, skipIsExists bool) (*firestore.DocumentRef, error) {
-	err := c.refreshToken(false)
+	err := c.refreshToken()
 	if err != nil {
 		return nil, err
 	}
@@ -322,7 +295,7 @@ chmod a+x fuzzit
 }
 
 func (c *FuzzitClient) CreateJob(jobConfig Job, files []string) (*firestore.DocumentRef, error) {
-	err := c.refreshToken(false)
+	err := c.refreshToken()
 	if err != nil {
 		return nil, err
 	}
