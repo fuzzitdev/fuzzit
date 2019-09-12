@@ -8,7 +8,7 @@ import (
 )
 
 const FuzzitEndpoint = "https://app.fuzzit.dev"
-const Version = "v2.4.47"
+const Version = "v2.4.48"
 
 const (
 	libFuzzerEngine = "libFuzzerEngine"
