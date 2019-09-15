@@ -30,7 +30,7 @@ var gFuzzitClient *client.FuzzitClient
 
 var rootCmd = &cobra.Command{
 	Use:     "fuzzit",
-	Short:   "Continuous fuzzing made simple CLI",
+	Short:   "Fuzzit CLI",
 	Version: client.Version,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		apiKey := viper.GetString("api-key")

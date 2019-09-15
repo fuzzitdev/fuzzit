@@ -17,48 +17,33 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
+	"github.com/fuzzitdev/fuzzit/v2/client"
 	"github.com/spf13/cobra"
 	"log"
-	"os"
 )
+
+var runJob = client.Job{}
 
 // authCmd represents the auth command
 var runCmd = &cobra.Command{
-	Use:   "run",
+	Use:   "run ORG_ID TARGET_ID [JOB_ID]",
 	Short: "Run job locally (used by the agent)",
-	Args:  cobra.ExactArgs(0),
+	Args:  cobra.MinimumNArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
 		updateDB, err := cmd.Flags().GetBool("update-db")
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		fuzzingType, err := cmd.Flags().GetString("type")
-		if err != nil {
-			log.Fatalln(err)
-		}
-
-		orgId := os.Getenv("ORG_ID")
-		if orgId == "" {
-			log.Fatalln(fmt.Errorf("ORG_ID environment variable should be provided"))
-		}
-
-		targetId := os.Getenv("TARGET_ID")
-		if orgId == "" {
-			log.Fatalln(fmt.Errorf("TARGET_ID environment variable should be provided"))
-		}
-
+		gFuzzitClient.Org = args[0]
+		runJob.OrgId = args[0]
+		runJob.TargetId = args[1]
 		jobId := ""
-		if updateDB {
-			jobId = os.Getenv("JOB_ID")
-			if orgId == "" {
-				log.Fatalln(fmt.Errorf("JOB_ID environment variable should be provided"))
-			}
+		if len(args) == 3 {
+			jobId = args[2]
 		}
 
-		gFuzzitClient.Org = orgId
-		err = gFuzzitClient.RunFuzzer(targetId, jobId, updateDB, fuzzingType)
+		err = gFuzzitClient.RunFuzzer(runJob, jobId, updateDB)
 
 		if err != nil {
 			log.Fatalln(err)
@@ -70,5 +55,7 @@ var runCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(runCmd)
 	runCmd.Flags().Bool("update-db", false, "if this runs on fuzzit then update db")
-	runCmd.Flags().String("type", "fuzzing", "fuzzing/regression")
+	runCmd.Flags().StringVar(&runJob.Type, "type", "fuzzing", "fuzzing/regression")
+	runCmd.Flags().StringVar(&runJob.Engine, "engine", "libfuzzer", "libfuzzer/jqf")
+	runCmd.Flags().StringVar(&runJob.Args, "args", "", "Additional runtime args for the fuzzer")
 }

@@ -187,7 +187,7 @@ func (c *FuzzitClient) runLibFuzzerFuzzing() error {
 		for !stopSession {
 			select {
 			case <-timeout:
-				var fuzzingJob job
+				var fuzzingJob Job
 				if err := c.refreshToken(); err != nil {
 					return err
 				}
@@ -322,7 +322,7 @@ func (c *FuzzitClient) runLibFuzzerRegression() error {
 
 func (c *FuzzitClient) transitionToInProgress() error {
 	ctx := context.Background()
-
+	job := Job{}
 	if c.updateDB {
 		// transaction doesnt work for now at go client with oauth token
 		jobRef := c.firestoreClient.Doc(fmt.Sprintf("orgs/%s/targets/%s/jobs/%s", c.Org, c.targetId, c.jobId))
@@ -330,11 +330,11 @@ func (c *FuzzitClient) transitionToInProgress() error {
 		if err != nil {
 			return err
 		}
-		err = docsnap.DataTo(&c.currentJob)
+		err = docsnap.DataTo(&job)
 		if err != nil {
 			return err
 		}
-		if c.currentJob.Status == "queued" {
+		if job.Status == "queued" {
 			_, err := jobRef.Update(ctx, []firestore.Update{{Path: "status", Value: "in progress"}})
 			if err != nil {
 				return err
@@ -364,12 +364,16 @@ func (c *FuzzitClient) transitionStatus(status string) error {
 func (c *FuzzitClient) RunJQFFuzzing() error {
 	ctx := context.Background()
 
+	log.Println("downloading zest cli...")
+	err := DownloadFile("zest-cli.jar", "https://storage.googleapis.com/public-fuzzit/jqf-fuzz-1.3-SNAPSHOT-zest-cli.jar")
+
 	args := []string{
-		"-Djqf.ei.EXIT_ON_CRASH=true",
-		"-Djqf.ei.LIBFUZZER_COMPAT_OUTPUT=true",
-		"-Djqf.ei.TIMEOUT=3600000",
 		"-jar",
-		"fuzzer.jar",
+		"zest-cli.jar",
+		"--exit-on-crash",
+		"--exact-crash-path=crash",
+		"--libfuzzer-compat-output",
+		"fuzzer",
 	}
 	args = append(args, strings.Split(c.currentJob.Args, " ")...)
 	path, err := exec.LookPath("java")
@@ -380,7 +384,7 @@ func (c *FuzzitClient) RunJQFFuzzing() error {
 	var exitCode int
 	for err == nil {
 		log.Println(err)
-		log.Println("Running fuzzing with: java -jar fuzzer.jar corpus seed")
+		log.Printf("Running fuzzing with: %v", args)
 		cmd := exec.Command(path,
 			args...)
 		if err := appendPrefixToCmd(cmd); err != nil {
@@ -395,7 +399,7 @@ func (c *FuzzitClient) RunJQFFuzzing() error {
 		for !stopSession {
 			select {
 			case <-timeout:
-				var fuzzingJob job
+				var fuzzingJob Job
 				if err := c.refreshToken(); err != nil {
 					return err
 				}
@@ -462,14 +466,12 @@ func (c *FuzzitClient) RunJQFFuzzing() error {
 	return nil
 }
 
-func (c *FuzzitClient) RunFuzzer(targetId string, jobId string, updateDB bool, fuzzingType string) error {
-	if c.ApiKey != "" {
-		if err := c.refreshToken(); err != nil {
-			return err
-		}
+func (c *FuzzitClient) RunFuzzer(job Job, jobId string, updateDB bool) error {
+	if err := c.refreshToken(); err != nil {
+		return err
 	}
 
-	c.targetId = targetId
+	c.currentJob = job
 	c.jobId = jobId
 	c.updateDB = updateDB
 
@@ -486,25 +488,26 @@ func (c *FuzzitClient) RunFuzzer(targetId string, jobId string, updateDB bool, f
 
 	if jobId != "" {
 		log.Println("downloading fuzzer")
-		if err := c.DownloadAndExtractFuzzer(".", targetId, jobId); err != nil {
+		if err := c.DownloadAndExtractFuzzer(".", c.currentJob.TargetId, jobId); err != nil {
 			return err
 		}
 	}
 
-	if _, err := os.Stat("fuzzer"); err == nil {
-		c.engine = libFuzzerEngine
+	if c.currentJob.Engine == "jqf" {
+
+	} else {
+		if _, err := os.Stat("fuzzer"); os.IsNotExist(err) {
+			c.transitionStatus("failed")
+			return fmt.Errorf("fuzzer executable doesnt exist")
+
+		}
 		if err := os.Chmod("./fuzzer", 0770); err != nil {
 			return err
 		}
-	} else if _, err := os.Stat("fuzzer.jar"); err == nil {
-		c.engine = JQFEngine
-	} else {
-		c.transitionStatus("failed")
-		return fmt.Errorf("either fuzzer executable should exist or JQF .jar")
 	}
 
 	log.Println("downloading corpus")
-	if err := c.DownloadAndExtractCorpus("./corpus", targetId); err != nil {
+	if err := c.DownloadAndExtractCorpus("./corpus", c.currentJob.TargetId); err != nil {
 		if err.Error() == "404 Not Found" {
 			log.Println("no generating corpus yet. continue...")
 		} else {
@@ -513,7 +516,7 @@ func (c *FuzzitClient) RunFuzzer(targetId string, jobId string, updateDB bool, f
 	}
 
 	log.Println("downloading seed")
-	if err := c.DownloadAndExtractSeed("./seed", targetId); err != nil {
+	if err := c.DownloadAndExtractSeed("./seed", c.currentJob.TargetId); err != nil {
 		if err.Error() == "404 Not Found" {
 			log.Println("no seed corpus. continue...")
 		} else {
@@ -522,10 +525,10 @@ func (c *FuzzitClient) RunFuzzer(targetId string, jobId string, updateDB bool, f
 	}
 
 	var err error
-	if c.engine == JQFEngine {
+	if c.currentJob.Engine == "jqf" {
 		err = c.RunJQFFuzzing()
 	} else {
-		if fuzzingType == "regression" {
+		if job.Type == "regression" {
 			err = c.runLibFuzzerRegression()
 		} else {
 			err = c.runLibFuzzerFuzzing()

@@ -21,26 +21,20 @@ type Target struct {
 }
 
 type Job struct {
-	TargetId             string   `firestore:"target_id"`
-	Args                 string   `firestore:"args"`
-	Type                 string   `firestore:"type"`
-	Engine               string   `firestore:"engine"`
-	Host                 string   `firestore:"host"`
-	Revision             string   `firestore:"revision"`
-	Branch               string   `firestore:"branch"`
-	Parallelism          uint16   `firestore:"parallelism"`
-	EnvironmentVariables []string `firestore:"environment_variables"`
-}
-
-// Internal struct
-type job struct {
-	Completed uint16    `firestore:"completed"`
-	Status    string    `firestore:"status"`
-	Namespace string    `firestore:"namespace"`
-	StartedAt time.Time `firestore:"started_at,serverTimestamp"`
-	OrgId     string    `firestore:"org_id"`
-	V2        bool      `firestore:"v2"`
-	Job
+	TargetId             string    `firestore:"target_id"`
+	Args                 string    `firestore:"args"`
+	Type                 string    `firestore:"type"`
+	Engine               string    `firestore:"engine"`
+	Host                 string    `firestore:"host"`
+	Revision             string    `firestore:"revision"`
+	Branch               string    `firestore:"branch"`
+	Parallelism          uint16    `firestore:"parallelism"`
+	EnvironmentVariables []string  `firestore:"environment_variables"`
+	Completed            uint16    `firestore:"completed"`
+	Status               string    `firestore:"status"`
+	Namespace            string    `firestore:"namespace"`
+	StartedAt            time.Time `firestore:"started_at,serverTimestamp"`
+	OrgId                string    `firestore:"org_id"`
 }
 
 type crash struct {
@@ -66,12 +60,11 @@ type FuzzitClient struct {
 	LastRefresh     int64
 	firestoreClient *firestore.Client
 	httpClient      *http.Client
-	currentJob      job    // this is mainly used by the agent
+	currentJob      Job    // this is mainly used by the agent
 	targetId        string // this is mainly used by the agent
 	jobId           string // this is mainly used by the agent
 	updateDB        bool   // this is mainly used by the agent
 	fuzzerFilename  string // this is mainly used by the agent
-	engine          string
 }
 
 func NewUnAuthenticatedClient() *FuzzitClient {

@@ -207,7 +207,20 @@ func (c *FuzzitClient) CreateLocalJob(jobConfig Job, files []string) error {
 	}
 
 	log.Println("Pulling container")
-	reader, err := cli.ImagePull(ctx, HostToDocker[jobConfig.Host], types.ImagePullOptions{})
+	image := HostToDocker[jobConfig.Host]
+	if image == "" {
+		if jobConfig.Host == "" {
+			if jobConfig.Engine == "jqf" {
+				image = "openjdk:stretch"
+			} else {
+				image = "gcr.io/fuzzit-public/stretch-llvm8:64bdedf"
+			}
+		} else {
+			image = jobConfig.Host
+		}
+	}
+	log.Printf("running regression in image: %s\n", image)
+	reader, err := cli.ImagePull(ctx, image, types.ImagePullOptions{})
 	if err != nil {
 		return err
 	}
@@ -223,11 +236,9 @@ func (c *FuzzitClient) CreateLocalJob(jobConfig Job, files []string) error {
 					"ARGS=" + jobConfig.Args,
 					"LD_LIBRARY_PATH=/app",
 					"FUZZIT_API_KEY=" + c.ApiKey,
-					"ORG_ID=" + c.Org,
-					"TARGET_ID=" + jobConfig.TargetId,
 				},
 				jobConfig.EnvironmentVariables...),
-			Image: HostToDocker[jobConfig.Host],
+			Image: image,
 			Cmd: []string{
 				"/bin/sh",
 				"-c",
@@ -235,7 +246,7 @@ func (c *FuzzitClient) CreateLocalJob(jobConfig Job, files []string) error {
 echo "Downloading fuzzit cli/agent..."
 wget -q -O fuzzit https://github.com/fuzzitdev/fuzzit/releases/download/%s/fuzzit_Linux_x86_64
 chmod a+x fuzzit
-./fuzzit run --type regression`, Version),
+./fuzzit run --type regression %s %s`, Version, c.Org, c.targetId),
 			},
 			AttachStdin: true,
 		},
@@ -301,13 +312,10 @@ func (c *FuzzitClient) CreateJob(jobConfig Job, files []string) (*firestore.Docu
 	}
 	ctx := context.Background()
 	collectionRef := c.firestoreClient.Collection("orgs/" + c.Org + "/targets/" + jobConfig.TargetId + "/jobs")
-	fullJob := job{}
-	fullJob.Job = jobConfig
-	fullJob.Completed = 0
-	fullJob.OrgId = c.Org
-	fullJob.Namespace = c.Namespace
-	fullJob.Status = "queued"
-	fullJob.V2 = true
+	jobConfig.Completed = 0
+	jobConfig.OrgId = c.Org
+	jobConfig.Namespace = c.Namespace
+	jobConfig.Status = "queued"
 
 	jobRef := collectionRef.NewDoc()
 
@@ -347,7 +355,7 @@ func (c *FuzzitClient) CreateJob(jobConfig Job, files []string) (*firestore.Docu
 	}
 
 	log.Println("Starting job")
-	_, err = jobRef.Set(ctx, fullJob)
+	_, err = jobRef.Set(ctx, jobConfig)
 	if err != nil {
 		log.Printf("Please check that the target '%s' exists and you have sufficiant permissions",
 			jobConfig.TargetId)

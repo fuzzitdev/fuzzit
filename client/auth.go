@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net/url"
 	"time"
 
@@ -15,6 +16,11 @@ import (
 )
 
 func (c *FuzzitClient) refreshToken() error {
+	if c.ApiKey == "" {
+		log.Println("FUZZIT_API_KEY is not set. continue with public auth...")
+		return nil
+	}
+
 	createCustomTokenEndpoint := fmt.Sprintf("%s/createCustomToken?api_key=%s", FuzzitEndpoint, url.QueryEscape(c.ApiKey))
 	r, err := c.httpClient.Get(createCustomTokenEndpoint)
 	if err != nil {
