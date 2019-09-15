@@ -108,7 +108,7 @@ func (c *FuzzitClient) runlibFuzzerMerge() error {
 		return err
 	}
 	if err := c.archiveAndUpload("merge",
-		fmt.Sprintf("orgs/%s/targets/%s/corpus.tar.gz", c.Org, c.targetId),
+		fmt.Sprintf("orgs/%s/targets/%s/corpus.tar.gz", c.Org, c.currentJob.TargetId),
 		"corpus.tar.gz"); err != nil {
 		return err
 	}
@@ -134,16 +134,16 @@ func (c *FuzzitClient) uploadCrash(exitCode int) error {
 	if _, err := os.Stat("artifact"); err == nil {
 		log.Printf("uploading crash...")
 		if err = c.uploadFile("artifact",
-			fmt.Sprintf("orgs/%s/targets/%s/crashes/%s-%s", c.Org, c.targetId, c.jobId, os.Getenv("POD_ID")),
+			fmt.Sprintf("orgs/%s/targets/%s/crashes/%s-%s", c.Org, c.currentJob.TargetId, c.jobId, os.Getenv("POD_ID")),
 			"crash"); err != nil {
 			return err
 		}
-		colRef := c.firestoreClient.Collection(fmt.Sprintf("orgs/%s/targets/%s/crashes", c.Org, c.targetId))
+		colRef := c.firestoreClient.Collection(fmt.Sprintf("orgs/%s/targets/%s/crashes", c.Org, c.currentJob.TargetId))
 		_, _, err = colRef.Add(ctx, crash{
-			TargetName: c.targetId,
+			TargetName: c.currentJob.TargetId,
 			PodId:      os.Getenv("POD_ID"),
 			JobId:      c.jobId,
-			TargetId:   c.targetId,
+			TargetId:   c.currentJob.TargetId,
 			OrgId:      c.Org,
 			ExitCode:   uint32(exitCode),
 			Type:       "CRASH",
@@ -191,7 +191,7 @@ func (c *FuzzitClient) runLibFuzzerFuzzing() error {
 				if err := c.refreshToken(); err != nil {
 					return err
 				}
-				docRef := c.firestoreClient.Doc(fmt.Sprintf("orgs/%s/targets/%s/jobs/%s", c.Org, c.targetId, c.jobId))
+				docRef := c.firestoreClient.Doc(fmt.Sprintf("orgs/%s/targets/%s/jobs/%s", c.Org, c.currentJob.TargetId, c.jobId))
 				if docRef == nil {
 					return fmt.Errorf("invalid resource")
 				}
@@ -325,7 +325,7 @@ func (c *FuzzitClient) transitionToInProgress() error {
 	job := Job{}
 	if c.updateDB {
 		// transaction doesnt work for now at go client with oauth token
-		jobRef := c.firestoreClient.Doc(fmt.Sprintf("orgs/%s/targets/%s/jobs/%s", c.Org, c.targetId, c.jobId))
+		jobRef := c.firestoreClient.Doc(fmt.Sprintf("orgs/%s/targets/%s/jobs/%s", c.Org, c.currentJob.TargetId, c.jobId))
 		docsnap, err := jobRef.Get(ctx)
 		if err != nil {
 			return err
@@ -352,7 +352,7 @@ func (c *FuzzitClient) transitionStatus(status string) error {
 	}
 
 	// transaction doesnt work for now at go client with oauth token
-	jobRef := c.firestoreClient.Doc(fmt.Sprintf("orgs/%s/targets/%s/jobs/%s", c.Org, c.targetId, c.jobId))
+	jobRef := c.firestoreClient.Doc(fmt.Sprintf("orgs/%s/targets/%s/jobs/%s", c.Org, c.currentJob.TargetId, c.jobId))
 	_, err := jobRef.Update(ctx, []firestore.Update{{Path: "status", Value: status}})
 	if err != nil {
 		return err
@@ -403,7 +403,7 @@ func (c *FuzzitClient) RunJQFFuzzing() error {
 				if err := c.refreshToken(); err != nil {
 					return err
 				}
-				docRef := c.firestoreClient.Doc(fmt.Sprintf("orgs/%s/targets/%s/jobs/%s", c.Org, c.targetId, c.jobId))
+				docRef := c.firestoreClient.Doc(fmt.Sprintf("orgs/%s/targets/%s/jobs/%s", c.Org, c.currentJob.TargetId, c.jobId))
 				if docRef == nil {
 					return fmt.Errorf("invalid resource")
 				}

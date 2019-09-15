@@ -229,6 +229,7 @@ func (c *FuzzitClient) CreateLocalJob(jobConfig Job, files []string) error {
 		return err
 	}
 	log.Println("Creating container")
+	log.Printf("org=%s\n", c.Org)
 	createdContainer, err := cli.ContainerCreate(ctx,
 		&container.Config{
 			Env: append(
@@ -246,7 +247,7 @@ func (c *FuzzitClient) CreateLocalJob(jobConfig Job, files []string) error {
 echo "Downloading fuzzit cli/agent..."
 wget -q -O fuzzit https://github.com/fuzzitdev/fuzzit/releases/download/%s/fuzzit_Linux_x86_64
 chmod a+x fuzzit
-./fuzzit run --type regression %s %s`, Version, c.Org, c.targetId),
+./fuzzit run --type regression %s %s`, Version, c.Org, jobConfig.TargetId),
 			},
 			AttachStdin: true,
 		},

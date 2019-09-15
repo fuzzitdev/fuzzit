@@ -8,12 +8,7 @@ import (
 )
 
 const FuzzitEndpoint = "https://app.fuzzit.dev"
-const Version = "v2.4.49"
-
-const (
-	libFuzzerEngine = "libFuzzerEngine"
-	JQFEngine       = "JQF"
-)
+const Version = "v2.4.50"
 
 type Target struct {
 	Name         string `firestore:"target_name"`
@@ -61,7 +56,6 @@ type FuzzitClient struct {
 	firestoreClient *firestore.Client
 	httpClient      *http.Client
 	currentJob      Job    // this is mainly used by the agent
-	targetId        string // this is mainly used by the agent
 	jobId           string // this is mainly used by the agent
 	updateDB        bool   // this is mainly used by the agent
 	fuzzerFilename  string // this is mainly used by the agent
