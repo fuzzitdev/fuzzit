@@ -85,6 +85,7 @@ func TestCreateLocalJob(t *testing.T) {
 		t.Run(fmt.Sprintf("target:%s, err:%s", tc.target, tc.err), func(t *testing.T) {
 			newJob.Type = "regression"
 			newJob.TargetId = tc.target
+			newJob.Host = "gcr.io/fuzzit-public/stretch-llvm8:64bdedf"
 			err := tc.client.CreateLocalJob(newJob, []string{"testdata/fuzzer.tar.gz"})
 			if err != nil {
 				if err.Error() != tc.err {

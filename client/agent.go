@@ -21,6 +21,9 @@ const (
 	libFuzzerOOMExitCode     = -9
 	libFuzzerSuccessExitCode = 0
 
+	jqfCrashExitCode   = 3
+	jqfSuccessExitCode = 0
+
 	fuzzingInterval = 3600
 )
 
@@ -36,6 +39,20 @@ func libFuzzerExitCodeToStatus(exitCode int) string {
 	case libFuzzerOOMExitCode:
 		status = "oom"
 	case libFuzzerSuccessExitCode:
+		status = "pass"
+	default:
+		status = "failed"
+	}
+
+	return status
+}
+
+func jqfExitCodeToStatus(exitCode int) string {
+	status := "pass"
+	switch exitCode {
+	case jqfCrashExitCode:
+		status = "crash"
+	case jqfSuccessExitCode:
 		status = "pass"
 	default:
 		status = "failed"
@@ -371,7 +388,7 @@ func (c *FuzzitClient) RunJQFFuzzing() error {
 		"-jar",
 		"zest-cli.jar",
 		"--exit-on-crash",
-		"--exact-crash-path=crash",
+		"--exact-crash-path=artifact",
 		"--libfuzzer-compat-output",
 		"fuzzer",
 	}
@@ -458,7 +475,7 @@ func (c *FuzzitClient) RunJQFFuzzing() error {
 		return err
 	}
 
-	err = c.transitionStatus(libFuzzerExitCodeToStatus(exitCode))
+	err = c.transitionStatus(jqfExitCodeToStatus(exitCode))
 	if err != nil {
 		return err
 	}

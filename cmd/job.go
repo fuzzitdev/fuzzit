@@ -41,6 +41,20 @@ var jobCmd = &cobra.Command{
 			log.Fatalf("--engine should be either libfuzzer or jqf. Recieved: %s", newJob.Type)
 		}
 
+		image := client.HostToDocker[newJob.Host]
+		if image == "" {
+			if newJob.Host == "" {
+				if newJob.Engine == "jqf" {
+					image = "openjdk:stretch"
+				} else {
+					image = "gcr.io/fuzzit-public/stretch-llvm8:64bdedf"
+				}
+			} else {
+				image = newJob.Host
+			}
+		}
+		newJob.Host = image
+
 		skipIfNotExist, err := cmd.Flags().GetBool("skip-if-not-exists")
 		if err != nil {
 			log.Fatal(err)
@@ -97,7 +111,7 @@ func init() {
 	jobCmd.Flags().Uint16Var(&newJob.Parallelism, "cpus", 1, "number of cpus to use (only relevant for fuzzing job)")
 	jobCmd.Flags().StringVar(&newJob.Revision, "revision", revision, "Revision tag of fuzzer (populates automatically from git,travis,circleci)")
 	jobCmd.Flags().StringVar(&newJob.Branch, "branch", branch, "Branch of the fuzzer (populates automatically from git,travis,circleci)")
-	jobCmd.Flags().StringVar(&newJob.Host, "host", "stretch-llvm8", "docker image to use when running the fuzzer. Options: stretch-llvm8/stretch-llvm9/bionic-swift51")
+	jobCmd.Flags().StringVar(&newJob.Host, "host", "", "docker image to use when running the fuzzer. Options: stretch-llvm8/stretch-llvm9/bionic-swift51")
 	jobCmd.Flags().StringArrayVarP(&newJob.EnvironmentVariables, "environment", "e", nil,
 		"Additional environment variables for the fuzzer. For example ASAN_OPTINOS, UBSAN_OPTIONS or any other")
 	jobCmd.Flags().StringVar(&newJob.Args, "args", "", "Additional runtime args for the fuzzer")

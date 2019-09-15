@@ -206,21 +206,8 @@ func (c *FuzzitClient) CreateLocalJob(jobConfig Job, files []string) error {
 		return err
 	}
 
-	log.Println("Pulling container")
-	image := HostToDocker[jobConfig.Host]
-	if image == "" {
-		if jobConfig.Host == "" {
-			if jobConfig.Engine == "jqf" {
-				image = "openjdk:stretch"
-			} else {
-				image = "gcr.io/fuzzit-public/stretch-llvm8:64bdedf"
-			}
-		} else {
-			image = jobConfig.Host
-		}
-	}
-	log.Printf("running regression in image: %s\n", image)
-	reader, err := cli.ImagePull(ctx, image, types.ImagePullOptions{})
+	log.Printf("Pulling container %s\n", jobConfig.Host)
+	reader, err := cli.ImagePull(ctx, jobConfig.Host, types.ImagePullOptions{})
 	if err != nil {
 		return err
 	}
@@ -229,7 +216,6 @@ func (c *FuzzitClient) CreateLocalJob(jobConfig Job, files []string) error {
 		return err
 	}
 	log.Println("Creating container")
-	log.Printf("org=%s\n", c.Org)
 	createdContainer, err := cli.ContainerCreate(ctx,
 		&container.Config{
 			Env: append(
@@ -239,7 +225,8 @@ func (c *FuzzitClient) CreateLocalJob(jobConfig Job, files []string) error {
 					"FUZZIT_API_KEY=" + c.ApiKey,
 				},
 				jobConfig.EnvironmentVariables...),
-			Image: image,
+			Image:      jobConfig.Host,
+			WorkingDir: "/app",
 			Cmd: []string{
 				"/bin/sh",
 				"-c",
@@ -247,7 +234,7 @@ func (c *FuzzitClient) CreateLocalJob(jobConfig Job, files []string) error {
 echo "Downloading fuzzit cli/agent..."
 wget -q -O fuzzit https://github.com/fuzzitdev/fuzzit/releases/download/%s/fuzzit_Linux_x86_64
 chmod a+x fuzzit
-./fuzzit run --type regression %s %s`, Version, c.Org, jobConfig.TargetId),
+./fuzzit run --engine "%s" --type regression --args "%s" %s %s`, Version, jobConfig.Engine, jobConfig.Args, c.Org, jobConfig.TargetId),
 			},
 			AttachStdin: true,
 		},
