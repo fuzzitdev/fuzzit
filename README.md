@@ -6,7 +6,7 @@
 
 ## Fuzzit
 [Fuzzit](https://fuzzit.dev) helps you integrate Continuous Fuzzing to your [C/C++](https://github.com/fuzzitdev/example-c),
- [Go](https://github.com/fuzzitdev/example-go), [Rust](https://github.com/fuzzitdev/example-rust) and [Swift](https://github.com/fuzzitdev/example-swift)
+[Java](https://github.com/fuzzitdev/example-java), [Go](https://github.com/fuzzitdev/example-go), [Rust](https://github.com/fuzzitdev/example-rust) and [Swift](https://github.com/fuzzitdev/example-swift)
  projects with your current CI/CD workflow
 
 [![Fuzzit Introduction](https://img.youtube.com/vi/Va7rfTTPiNo/maxresdefault.jpg)](https://www.youtube.com/watch?v=Va7rfTTPiNo)
@@ -57,6 +57,7 @@ Run `fuzzit --help` to get a full list of commands, or check out our [docs](http
 Fuzzit currently supports C/C++, Go and Rust
 
 * [C/C++ example](https://github.com/fuzzitdev/example-c)
+* [Java example](https://github.com/fuzzitdev/example-java)
 * [Go example](https://github.com/fuzzitdev/example-go)
 * [Rust example](https://github.com/fuzzitdev/example-rust)
 * [Swift example](https://github.com/fuzzitdev/example-swift)
