@@ -124,17 +124,18 @@ func (c *FuzzitClient) runlibFuzzerMerge() error {
 	if err := c.refreshToken(); err != nil {
 		return err
 	}
-	if err := c.archiveAndUpload("merge",
-		fmt.Sprintf("orgs/%s/targets/%s/corpus.tar.gz", c.Org, c.currentJob.TargetId),
-		"corpus.tar.gz"); err != nil {
-		return err
-	}
 
 	if err := os.RemoveAll("corpus"); err != nil {
 		return err
 	}
 
 	if err := os.Rename("merge", "corpus"); err != nil {
+		return err
+	}
+
+	if err := c.archiveAndUpload("corpus",
+		fmt.Sprintf("orgs/%s/targets/%s/corpus.tar.gz", c.Org, c.currentJob.TargetId),
+		"corpus.tar.gz"); err != nil {
 		return err
 	}
 
