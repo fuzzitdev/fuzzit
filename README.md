@@ -82,6 +82,9 @@ More information can be found in our [docs](https://docs.fuzzit.dev).
 - [lucas-clemente/quic-go](https://github.com/lucas-clemente/quic-go)
 - [gomarkdown/markdown](https://github.com/gomarkdown/markdown)
 
+* RUST
+- [CraneStation/cranelift](https://github.com/CraneStation/cranelift)
+
 * C/C++ 
 - [systemd/systemd](https://github.com/systemd/systemd)
 - [apache/arrow](https://github.com/apache/arrow)
