@@ -1,6 +1,9 @@
 package client
 
 import (
+	"context"
+	"google.golang.org/api/option"
+	"google.golang.org/grpc"
 	"net/http"
 	"time"
 
@@ -8,7 +11,7 @@ import (
 )
 
 const FuzzitEndpoint = "https://app.fuzzit.dev"
-const Version = "v2.4.53"
+const Version = "v2.4.54"
 
 type Target struct {
 	Name         string `firestore:"target_name"`
@@ -61,19 +64,27 @@ type FuzzitClient struct {
 	fuzzerFilename  string // this is mainly used by the agent
 }
 
-func NewUnAuthenticatedClient() *FuzzitClient {
-	c := &FuzzitClient{}
-	c.httpClient = &http.Client{Timeout: 120 * time.Second}
-	return c
-}
-
 func NewFuzzitClient(apiKey string) (*FuzzitClient, error) {
+	ctx := context.Background()
+
 	c := &FuzzitClient{}
 	c.httpClient = &http.Client{Timeout: 120 * time.Second}
 	c.ApiKey = apiKey
-	err := c.refreshToken()
+
+	conn, err := grpc.Dial("firestore.googleapis.com", grpc.WithInsecure())
 	if err != nil {
 		return nil, err
 	}
+
+	firestoreClient, err := firestore.NewClient(ctx, "fuzzit-b5fbf", option.WithGRPCConn(conn))
+	c.firestoreClient = firestoreClient
+	if err != nil {
+		return nil, err
+	}
+
+	if err := c.refreshToken(); err != nil {
+		return nil, err
+	}
+
 	return c, nil
 }

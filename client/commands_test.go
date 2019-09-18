@@ -8,7 +8,10 @@ import (
 )
 
 func TestDownloadAndExtractCorpus(t *testing.T) {
-	unAuthenticatedClient := NewUnAuthenticatedClient()
+	unAuthenticatedClient, err := NewFuzzitClient("")
+	if err != nil {
+		t.Fatal(err)
+	}
 	unAuthenticatedClient.Org = "fuzzitdev"
 
 	authenticatedClient, err := NewFuzzitClient(os.Getenv("FUZZIT_API_KEY"))
@@ -54,7 +57,10 @@ func TestDownloadAndExtractCorpus(t *testing.T) {
 }
 
 func TestCreateLocalJob(t *testing.T) {
-	unAuthenticatedClient := NewUnAuthenticatedClient()
+	unAuthenticatedClient, err := NewFuzzitClient("")
+	if err != nil {
+		t.Fatal(err)
+	}
 	unAuthenticatedClient.Org = "fuzzitdev"
 
 	authenticatedClient, err := NewFuzzitClient(os.Getenv("FUZZIT_API_KEY"))
