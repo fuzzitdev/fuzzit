@@ -497,9 +497,6 @@ func (c *FuzzitClient) RunFuzzer(job Job, jobId string, updateDB bool) error {
 		return err
 	}
 
-	if err := os.Mkdir("corpus", 0644); err != nil {
-		return err
-	}
 	if err := os.Mkdir("seed", 0644); err != nil {
 		return err
 	}
@@ -525,10 +522,16 @@ func (c *FuzzitClient) RunFuzzer(job Job, jobId string, updateDB bool) error {
 	}
 
 	log.Println("downloading corpus")
-	if err := c.DownloadAndExtractCorpus("./corpus", c.currentJob.TargetId); err != nil {
+	if err := c.DownloadAndExtractCorpus(".", c.currentJob.TargetId); err != nil {
 		if err.Error() == "404 Not Found" {
 			log.Println("no generating corpus yet. continue...")
 		} else {
+			return err
+		}
+	}
+
+	if _, err := os.Stat("corpus"); os.IsNotExist(err) {
+		if err := os.Mkdir("corpus", 0644); err != nil {
 			return err
 		}
 	}
