@@ -20,6 +20,7 @@ import (
 	"github.com/fuzzitdev/fuzzit/v2/client"
 	"github.com/spf13/cobra"
 	"log"
+	"os"
 )
 
 var runJob = client.Job{}
@@ -44,9 +45,13 @@ var runCmd = &cobra.Command{
 		}
 
 		err = gFuzzitClient.RunFuzzer(runJob, jobId, updateDB)
-
 		if err != nil {
-			log.Fatalln(err)
+			log.Println(err)
+			if err.Error() == "401 Unauthorized" {
+				os.Exit(client.AgentNoPermissionError)
+			} else {
+				os.Exit(client.AgentGeneralError)
+			}
 		}
 	},
 	Hidden: true,

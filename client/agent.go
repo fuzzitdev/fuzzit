@@ -25,6 +25,9 @@ const (
 	jqfSuccessExitCode = 0
 
 	fuzzingInterval = 3600
+
+	AgentGeneralError      = 1
+	AgentNoPermissionError = 22
 )
 
 func libFuzzerExitCodeToStatus(exitCode int) string {

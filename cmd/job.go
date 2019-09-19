@@ -75,7 +75,7 @@ var jobCmd = &cobra.Command{
 
 		if newJob.Type == "local-regression" {
 			err = gFuzzitClient.CreateLocalJob(newJob, args[1:])
-			if err != nil && skipIfNotExist && err.Error() == "401 Unauthorized" {
+			if err != nil && skipIfNotExist && (err.Error() == "401 Unauthorized" || err.Error() == "fuzzer exited with 22") {
 				log.Println("Target doesn't exist yet. skipping...")
 				return
 			}
