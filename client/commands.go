@@ -32,6 +32,7 @@ var HostToDocker = map[string]string{
 	"stretch-llvm8":  "gcr.io/fuzzit-public/stretch-llvm8:64bdedf",
 	"stretch-llvm9":  "gcr.io/fuzzit-public/stretch-llvm9:4e6f6d3",
 	"bionic-swift51": "gcr.io/fuzzit-public/bionic-swift51:beb0e9b",
+	"bionic-llvm7":   "gcr.io/fuzzit-public/bionic-llvm7:6cf3292",
 }
 
 func (c *FuzzitClient) archiveFiles(files []string) (string, error) {
