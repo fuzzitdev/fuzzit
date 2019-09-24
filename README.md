@@ -87,6 +87,7 @@ More information can be found in our [docs](https://docs.fuzzit.dev).
 
 * C/C++ 
 - [systemd/systemd](https://github.com/systemd/systemd)
+- [envoyproxy/envoy](https://github.com/envoyproxy/envoy)
 - [apache/arrow](https://github.com/apache/arrow)
 - [radare/radare2](https://github.com/radare/radare2)
 - [AndreRenaud/PDFGen](https://github.com/AndreRenaud/PDFGen)
