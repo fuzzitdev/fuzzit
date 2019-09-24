@@ -18,6 +18,7 @@ package cmd
 import (
 	"github.com/fuzzitdev/fuzzit/v2/client"
 	"log"
+	"strings"
 
 	"github.com/spf13/cobra"
 )
@@ -43,6 +44,15 @@ var targetCmd = &cobra.Command{
 		}
 
 		newTarget.Name = args[0]
+
+		targetSplice := strings.Split(args[0], "/")
+		if len(targetSplice) > 2 {
+			log.Fatalf("[TARGET] can only be of type 'target' or 'project/target-name'.")
+		} else if len(targetSplice) == 2 {
+			newTarget.Name = targetSplice[1]
+			gFuzzitClient.Org = targetSplice[0]
+		}
+
 		_, err = gFuzzitClient.CreateTarget(newTarget, seed, skipIfExists)
 		if err != nil {
 			log.Fatal(err)
