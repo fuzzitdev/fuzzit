@@ -186,12 +186,14 @@ func (c *FuzzitClient) runLibFuzzerFuzzing() error {
 			"-exact_artifact_path=./artifact",
 			"-error_exitcode=76",
 			"-max_total_time=3600",
+			"corpus",
+			"seed",
 		},
-		append(
-			strings.Split(c.currentJob.Args, " "),
-			"corpus", "seed",
-		)...,
 	)
+
+	if c.currentJob.Args != "" {
+		args = append(args, strings.Split(c.currentJob.Args, " ")...)
+	}
 
 	var err error
 	err = nil
@@ -305,11 +307,11 @@ func (c *FuzzitClient) runLibFuzzerRegression() error {
 			"-exact_artifact_path=./artifact",
 			"-error_exitcode=76",
 		},
-		append(
-			strings.Split(c.currentJob.Args, " "),
-			regressionFiles...,
-		)...,
+		regressionFiles...,
 	)
+	if c.currentJob.Args != "" {
+		args = append(args, strings.Split(c.currentJob.Args, " ")...)
+	}
 
 	log.Println("Running regression...")
 	cmd := exec.Command("./fuzzer",
@@ -407,7 +409,10 @@ func (c *FuzzitClient) RunJQFFuzzing() error {
 		"--libfuzzer-compat-output",
 		"fuzzer",
 	}
-	args = append(args, strings.Split(c.currentJob.Args, " ")...)
+	if c.currentJob.Args != "" {
+		args = append(args, strings.Split(c.currentJob.Args, " ")...)
+	}
+
 	path, err := exec.LookPath("java")
 	if err != nil {
 		return fmt.Errorf("java must be installed in the docker to run JQF fuzzer")
