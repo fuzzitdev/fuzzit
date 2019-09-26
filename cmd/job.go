@@ -34,11 +34,11 @@ var jobCmd = &cobra.Command{
 	Args:  cobra.MinimumNArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
 		if newJob.Type != "fuzzing" && newJob.Type != "regression" && newJob.Type != "local-regression" {
-			log.Fatalf("--type should be either fuzzing, regression or local-regression. Recieved: %s", newJob.Type)
+			log.Fatalf("--type should be either fuzzing, regression or local-regression. Received: %s", newJob.Type)
 		}
 
 		if newJob.Engine != "libfuzzer" && newJob.Engine != "jqf" {
-			log.Fatalf("--engine should be either libfuzzer or jqf. Recieved: %s", newJob.Type)
+			log.Fatalf("--engine should be either libfuzzer or jqf. Received: %s", newJob.Type)
 		}
 
 		image := client.HostToDocker[newJob.Host]

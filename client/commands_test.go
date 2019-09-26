@@ -45,7 +45,7 @@ func TestDownloadAndExtractCorpus(t *testing.T) {
 			err = tc.client.DownloadAndExtractCorpus(dir, tc.target)
 			if err != nil {
 				if err.Error() != tc.err {
-					t.Errorf("was expecting %s recieved %s", tc.err, err.Error())
+					t.Errorf("was expecting %s received %s", tc.err, err.Error())
 				}
 			} else {
 				if tc.err != "" {
@@ -95,7 +95,7 @@ func TestCreateLocalJob(t *testing.T) {
 			err := tc.client.CreateLocalJob(newJob, []string{"testdata/fuzzer.tar.gz"})
 			if err != nil {
 				if err.Error() != tc.err {
-					t.Errorf("was expecting %s recieved %s", tc.err, err.Error())
+					t.Errorf("was expecting %s received %s", tc.err, err.Error())
 				}
 			} else {
 				if tc.err != "" {
