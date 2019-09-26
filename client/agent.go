@@ -180,14 +180,18 @@ func (c *FuzzitClient) uploadCrash(exitCode int) error {
 func (c *FuzzitClient) runLibFuzzerFuzzing() error {
 	ctx := context.Background()
 
-	args := []string{
-		"-print_final_stats=1",
-		"-exact_artifact_path=./artifact",
-		"-error_exitcode=76",
-		"-max_total_time=3600",
-		"corpus",
-		"seed",
-	}
+	args := append(
+		[]string{
+			"-print_final_stats=1",
+			"-exact_artifact_path=./artifact",
+			"-error_exitcode=76",
+			"-max_total_time=3600",
+		},
+		append(
+			strings.Split(c.currentJob.Args, " "),
+			"corpus", "seed",
+		)...,
+	)
 
 	var err error
 	err = nil
@@ -295,11 +299,18 @@ func (c *FuzzitClient) runLibFuzzerRegression() error {
 		return nil
 	}
 
-	args := append([]string{
-		"-print_final_stats=1",
-		"-exact_artifact_path=./artifact",
-		"-error_exitcode=76",
-	}, regressionFiles...)
+	args := append(
+		[]string{
+			"-print_final_stats=1",
+			"-exact_artifact_path=./artifact",
+			"-error_exitcode=76",
+		},
+		append(
+			strings.Split(c.currentJob.Args, " "),
+			regressionFiles...,
+		)...,
+	)
+
 	log.Println("Running regression...")
 	cmd := exec.Command("./fuzzer",
 		args...)
