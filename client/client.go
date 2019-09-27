@@ -11,7 +11,7 @@ import (
 )
 
 const FuzzitEndpoint = "https://app.fuzzit.dev"
-const Version = "v2.4.59"
+const Version = "v2.4.60"
 
 type Target struct {
 	Name         string `firestore:"target_name"`
@@ -44,6 +44,7 @@ type crash struct {
 	ExitCode   uint32    `firestore:"exit_code"`
 	Type       string    `firestore:"type"`
 	Time       time.Time `firestore:"time,serverTimestamp"`
+	V2         bool      `firestore:"v2"`
 }
 
 type FuzzitClient struct {

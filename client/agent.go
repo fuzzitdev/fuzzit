@@ -153,21 +153,24 @@ func (c *FuzzitClient) uploadCrash(exitCode int) error {
 	}
 
 	if _, err := os.Stat("artifact"); err == nil {
+		colRef := c.firestoreClient.Collection(fmt.Sprintf("orgs/%s/targets/%s/jobs/%s/crashes", c.Org, c.jobId, c.currentJob.TargetId))
+		crashRef := colRef.NewDoc()
+
 		log.Printf("uploading crash...")
 		if err = c.uploadFile("artifact",
-			fmt.Sprintf("orgs/%s/targets/%s/crashes/%s-%s", c.Org, c.currentJob.TargetId, c.jobId, os.Getenv("POD_ID")),
-			"crash"); err != nil {
+			fmt.Sprintf("orgs/%s/targets/%s/jobs/%s/crashes/%s", c.Org, c.currentJob.TargetId, c.jobId, crashRef.ID),
+			fmt.Sprintf("crash-%s", c.currentJob.TargetId)); err != nil {
 			return err
 		}
-		colRef := c.firestoreClient.Collection(fmt.Sprintf("orgs/%s/targets/%s/crashes", c.Org, c.currentJob.TargetId))
-		_, _, err = colRef.Add(ctx, crash{
+
+		_, err = crashRef.Set(ctx, crash{
 			TargetName: c.currentJob.TargetId,
-			PodId:      os.Getenv("POD_ID"),
 			JobId:      c.jobId,
 			TargetId:   c.currentJob.TargetId,
 			OrgId:      c.Org,
 			ExitCode:   uint32(exitCode),
-			Type:       "CRASH",
+			Type:       "crash",
+			V2:         true,
 		})
 		if err != nil {
 			return err
