@@ -153,7 +153,7 @@ func (c *FuzzitClient) uploadCrash(exitCode int) error {
 	}
 
 	if _, err := os.Stat("artifact"); err == nil {
-		colRef := c.firestoreClient.Collection(fmt.Sprintf("orgs/%s/targets/%s/jobs/%s/crashes", c.Org, c.jobId, c.currentJob.TargetId))
+		colRef := c.firestoreClient.Collection(fmt.Sprintf("orgs/%s/targets/%s/jobs/%s/crashes", c.Org, c.currentJob.TargetId, c.jobId))
 		crashRef := colRef.NewDoc()
 
 		log.Printf("uploading crash...")
