@@ -95,6 +95,12 @@ func (c *FuzzitClient) runlibFuzzerMerge() error {
 		return nil
 	}
 
+	// this directory should not exist but do to some old bugs it might exist in the corpus, so we delete it
+	if _, err := os.Stat("merge"); err == nil {
+		if err = os.RemoveAll("merge"); err != nil {
+			return err
+		}
+	}
 	if err := os.Mkdir("merge", 0644); err != nil {
 		return err
 	}
