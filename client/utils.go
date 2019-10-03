@@ -8,6 +8,7 @@ import (
 	"os/user"
 	"path"
 	"path/filepath"
+	"strings"
 )
 
 func getCacheFile() (string, error) {
@@ -22,6 +23,18 @@ func getCacheFile() (string, error) {
 	}
 	cacheFile := path.Join(home, ".fuzzit.cache")
 	return cacheFile, nil
+}
+
+func splitAndRemoveEmpty(s string, delimiter string) []string {
+	splitted := strings.Split(s, delimiter)
+	var withoutEmptyStrings []string
+	for _, str := range splitted {
+		if str != "" {
+			withoutEmptyStrings = append(withoutEmptyStrings, str)
+		}
+	}
+
+	return withoutEmptyStrings
 }
 
 func GetValueFromEnv(variables ...string) string {

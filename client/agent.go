@@ -201,7 +201,7 @@ func (c *FuzzitClient) runLibFuzzerFuzzing() error {
 	)
 
 	if c.currentJob.Args != "" {
-		args = append(args, strings.Split(c.currentJob.Args, " ")...)
+		args = append(args, splitAndRemoveEmpty(c.currentJob.Args, " ")...)
 	}
 
 	var err error
@@ -319,7 +319,7 @@ func (c *FuzzitClient) runLibFuzzerRegression() error {
 		regressionFiles...,
 	)
 	if c.currentJob.Args != "" {
-		args = append(args, strings.Split(c.currentJob.Args, " ")...)
+		args = append(args, splitAndRemoveEmpty(c.currentJob.Args, " ")...)
 	}
 
 	log.Println("Running regression...")
@@ -419,7 +419,7 @@ func (c *FuzzitClient) RunJQFFuzzing() error {
 		"fuzzer",
 	}
 	if c.currentJob.Args != "" {
-		args = append(args, strings.Split(c.currentJob.Args, " ")...)
+		args = append(args, splitAndRemoveEmpty(c.currentJob.Args, " ")...)
 	}
 
 	path, err := exec.LookPath("java")
