@@ -81,6 +81,7 @@ More information can be found in our [docs](https://docs.fuzzit.dev).
 - [valyala/fasthttp](https://github.com/valyala/fasthttp)
 - [lucas-clemente/quic-go](https://github.com/lucas-clemente/quic-go)
 - [gomarkdown/markdown](https://github.com/gomarkdown/markdown)
+- [pquerna/ffjson](https://github.com/pquerna/ffjson)
 
 * RUST
 - [CraneStation/cranelift](https://github.com/CraneStation/cranelift)
