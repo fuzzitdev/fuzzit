@@ -17,6 +17,7 @@ package cmd
 
 import (
 	"log"
+	"strconv"
 	"strings"
 
 	"github.com/fuzzitdev/fuzzit/v2/client"
@@ -27,6 +28,20 @@ import (
 // jobCmd represents the job command
 
 var newJob = client.Job{}
+
+var allowedCPUs = map[string]bool{
+	"0.1": true,
+	"0.2": true,
+	"0.3": true,
+	"0.4": true,
+	"0.5": true,
+	"0.6": true,
+	"0.7": true,
+	"0.8": true,
+	"0.9": true,
+	"1":   true,
+	"1.0": true,
+}
 
 var jobCmd = &cobra.Command{
 	Use:   "job [target_id] [files...]",
@@ -39,6 +54,22 @@ var jobCmd = &cobra.Command{
 
 		if newJob.Engine != "libfuzzer" && newJob.Engine != "jqf" {
 			log.Fatalf("--engine should be either libfuzzer or jqf. Received: %s", newJob.Type)
+		}
+
+		if !allowedCPUs[newJob.CPUs] {
+			log.Fatalf("got %s cpus. CPUs can only be one of 0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1,1.0\n", newJob.CPUs)
+		}
+
+		if !strings.HasSuffix(newJob.Memory, "Mi") {
+			log.Fatalf("got %s memory. Memory should be suffixed by Mi\n", newJob.Memory)
+		}
+		megabytes := newJob.Memory[:len(newJob.Memory)-2]
+		i, err := strconv.Atoi(megabytes)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		if i > 2048 {
+			log.Fatalf("got %d Mi memory. > 2048Mi memory is only supported for enterprise customers\n", i)
 		}
 
 		image := client.HostToDocker[newJob.Host]
@@ -108,7 +139,10 @@ func init() {
 
 	jobCmd.Flags().StringVar(&newJob.Type, "type", "fuzzing", "fuzzing/regression/local-regression")
 	jobCmd.Flags().StringVar(&newJob.Engine, "engine", "libfuzzer", "libfuzzer/jqf")
-	jobCmd.Flags().Uint16Var(&newJob.Parallelism, "cpus", 1, "number of cpus to use (only relevant for fuzzing job)")
+	jobCmd.Flags().StringVar(&newJob.CPUs, "cpus", "1", "number of cpus to use (only relevant for fuzzing job)")
+	jobCmd.Flags().StringVar(&newJob.Memory, "memory", "2048Mi", "number of cpus to use (only relevant for fuzzing job)")
+	jobCmd.Flags().MarkHidden("memory")
+	jobCmd.Flags().MarkHidden("cpus")
 	jobCmd.Flags().StringVar(&newJob.Revision, "revision", revision, "Revision tag of fuzzer (populates automatically from git,travis,circleci)")
 	jobCmd.Flags().StringVar(&newJob.Branch, "branch", branch, "Branch of the fuzzer (populates automatically from git,travis,circleci)")
 	jobCmd.Flags().StringVar(&newJob.Host, "host", "", "docker image to use when running the fuzzer. Options: stretch-llvm8/stretch-llvm9/bionic-swift51")

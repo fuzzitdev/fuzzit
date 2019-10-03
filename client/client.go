@@ -11,7 +11,7 @@ import (
 )
 
 const FuzzitEndpoint = "https://app.fuzzit.dev"
-const Version = "v2.4.62"
+const Version = "v2.4.63"
 
 type Target struct {
 	Name         string `firestore:"target_name"`
@@ -26,7 +26,8 @@ type Job struct {
 	Host                 string    `firestore:"host"`
 	Revision             string    `firestore:"revision"`
 	Branch               string    `firestore:"branch"`
-	Parallelism          uint16    `firestore:"parallelism"`
+	CPUs                 string    `firestore:"cpus"`
+	Memory               string    `firestore:"memory"`
 	EnvironmentVariables []string  `firestore:"environment_variables"`
 	Completed            uint16    `firestore:"completed"`
 	Status               string    `firestore:"status"`
