@@ -118,6 +118,9 @@ func (c *FuzzitClient) runlibFuzzerMerge() error {
 		"merge",
 		"corpus",
 	}
+	if c.currentJob.Args != "" {
+		args = append(args, splitAndRemoveEmpty(c.currentJob.Args, " ")...)
+	}
 
 	log.Println("Running merge with: ./fuzzer " + strings.Join(args, " "))
 	cmd := exec.Command("./fuzzer",
