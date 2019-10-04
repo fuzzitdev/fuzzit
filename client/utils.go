@@ -3,6 +3,7 @@ package client
 import (
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"os/user"
@@ -23,6 +24,41 @@ func getCacheFile() (string, error) {
 	}
 	cacheFile := path.Join(home, ".fuzzit.cache")
 	return cacheFile, nil
+}
+
+func catFile(path string) error {
+	fh, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+	defer fh.Close()
+
+	_, err = io.Copy(os.Stdout, fh)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func catLastBytes(path string, lastBytes int64) error {
+	fh, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+	defer fh.Close()
+
+	buf := make([]byte, lastBytes)
+	stat, err := os.Stat(path)
+	start := stat.Size() - lastBytes
+	_, err = fh.ReadAt(buf, start)
+	if err != nil {
+		return err
+	}
+
+	log.Printf("%s\n", buf)
+
+	return nil
 }
 
 func splitAndRemoveEmpty(s string, delimiter string) []string {

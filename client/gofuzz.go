@@ -201,7 +201,13 @@ func (c *FuzzitClient) runGoFuzzFuzzing() error {
 				fileName := info.Name()
 				if !strings.Contains(fileName, ".") && !uniqueCrashes[fileName] && fileName != "crashers" {
 					uniqueCrashes[fileName] = true
-					err := c.uploadGoFuzzCrash("workdir/crashers/" + fileName)
+					log.Println("found new crash")
+					err := catLastBytes(fmt.Sprintf("workdir/crashers/%s.output", fileName), 1000)
+					if err != nil {
+						return err
+					}
+
+					err = c.uploadGoFuzzCrash("workdir/crashers/" + fileName)
 					if err != nil {
 						return err
 					}
@@ -209,7 +215,6 @@ func (c *FuzzitClient) runGoFuzzFuzzing() error {
 				return nil
 			})
 			if err != nil {
-				cmd.Process.Kill()
 				return err
 			}
 
