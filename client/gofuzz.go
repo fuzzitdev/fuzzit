@@ -241,7 +241,7 @@ func (c *FuzzitClient) runGoFuzzFuzzing() error {
 			stopSession = true
 			if err != nil {
 				log.Printf("process finished with error = %v\n", err)
-				return err
+				return nil
 			} else {
 				log.Print("process finished successfully")
 			}
