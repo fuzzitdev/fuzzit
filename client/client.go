@@ -11,7 +11,7 @@ import (
 )
 
 const FuzzitEndpoint = "https://app.fuzzit.dev"
-const Version = "v2.4.68"
+const Version = "v2.4.69"
 
 type Target struct {
 	Name         string `firestore:"target_name"`
