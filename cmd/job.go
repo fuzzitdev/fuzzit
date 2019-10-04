@@ -52,8 +52,8 @@ var jobCmd = &cobra.Command{
 			log.Fatalf("--type should be either fuzzing, regression or local-regression. Received: %s", newJob.Type)
 		}
 
-		if newJob.Engine != "libfuzzer" && newJob.Engine != "jqf" {
-			log.Fatalf("--engine should be either libfuzzer or jqf. Received: %s", newJob.Type)
+		if newJob.Engine != "libfuzzer" && newJob.Engine != "jqf" && newJob.Engine != "go-fuzz" {
+			log.Fatalf("--engine should be one of libfuzzer/go-fuzz/jqf. Received: %s", newJob.Type)
 		}
 
 		if !allowedCPUs[newJob.CPUs] {

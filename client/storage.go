@@ -144,6 +144,15 @@ func (c *FuzzitClient) downloadAndExtract(dirPath string, storagePath string) er
 	if err := c.downloadFile(tmpArchiveFile.Name(), storagePath); err != nil {
 		return err
 	}
+
+	if strings.HasSuffix(storagePath, "/fuzzer") && c.currentJob.Engine == "go-fuzz" {
+		if _, err := copyFile(filepath.Join(dirPath, "fuzzer.zip"), tmpArchiveFile.Name()); err != nil {
+			return err
+		}
+
+		return nil
+	}
+
 	buf, _ := ioutil.ReadFile(tmpArchiveFile.Name())
 
 	var unarchiver archiver.Unarchiver

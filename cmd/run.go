@@ -61,6 +61,6 @@ func init() {
 	rootCmd.AddCommand(runCmd)
 	runCmd.Flags().Bool("update-db", false, "if this runs on fuzzit then update db")
 	runCmd.Flags().StringVar(&runJob.Type, "type", "fuzzing", "fuzzing/regression")
-	runCmd.Flags().StringVar(&runJob.Engine, "engine", "libfuzzer", "libfuzzer/jqf")
+	runCmd.Flags().StringVar(&runJob.Engine, "engine", "libfuzzer", "libfuzzer/jqf/go-fuzz")
 	runCmd.Flags().StringVar(&runJob.Args, "args", "", "Additional runtime args for the fuzzer")
 }
