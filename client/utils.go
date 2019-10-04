@@ -50,8 +50,12 @@ func catLastBytes(path string, lastBytes int64) error {
 
 	buf := make([]byte, lastBytes)
 	stat, err := os.Stat(path)
-	start := stat.Size() - lastBytes
-	_, err = fh.ReadAt(buf, start)
+	start := 0
+	if stat.Size() > lastBytes {
+		start = int(stat.Size() - lastBytes)
+	}
+
+	_, err = fh.ReadAt(buf, int64(start))
 	if err != nil {
 		return err
 	}

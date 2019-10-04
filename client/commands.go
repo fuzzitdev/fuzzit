@@ -310,7 +310,7 @@ func (c *FuzzitClient) CreateJob(jobConfig Job, files []string) (*firestore.Docu
 
 	fuzzerPath := files[0]
 	filename := filepath.Base(fuzzerPath)
-	if !strings.HasSuffix(filename, ".tar.gz") {
+	if !strings.HasSuffix(filename, ".tar.gz") && jobConfig.Engine != "go-fuzz" {
 		tmpDir, err := ioutil.TempDir("", "fuzzit")
 		if err != nil {
 			return nil, err
