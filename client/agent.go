@@ -135,6 +135,20 @@ func (c *FuzzitClient) RunFuzzer(job Job, jobId string, updateDB bool) error {
 		if err := c.DownloadAndExtractFuzzer(".", c.currentJob.TargetId, jobId); err != nil {
 			return err
 		}
+
+		log.Println("downloading additional corpus")
+		if err := os.Mkdir("additional-corpus", 0644); err != nil {
+			return err
+		}
+		if err := c.downloadAndExtract(
+			"additional-corpus",
+			fmt.Sprintf("orgs/%s/targets/%s/jobs/%s/corpus.tar.gz", c.Org, c.currentJob.TargetId, c.jobId)); err != nil {
+			if err.Error() == "404 Not Found" {
+				log.Println("no additional-corpus. skipping...")
+			} else {
+				return err
+			}
+		}
 	}
 
 	var err error

@@ -67,26 +67,6 @@ func (c *FuzzitClient) loadCurrentCrashes() (map[string]bool, error) {
 	return uniqueCrashes, err
 }
 
-// this merges corpus into workdir
-func (c *FuzzitClient) mergeCorpus() error {
-	err := filepath.Walk("corpus", func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			log.Printf("prevent panic by handling failure accessing a path %q: %v\n", path, err)
-			return err
-		}
-		if !info.IsDir() {
-			fileName := info.Name()
-			err = os.Rename("corpus/"+fileName, "workdir/corpus/"+fileName)
-			if err != nil {
-				return err
-			}
-		}
-		return nil
-	})
-
-	return err
-}
-
 func (c *FuzzitClient) runGoFuzzFuzzing() error {
 	ctx := context.Background()
 
@@ -141,8 +121,10 @@ func (c *FuzzitClient) runGoFuzzFuzzing() error {
 		}
 	}
 
-	err = c.mergeCorpus()
-	if err != nil {
+	if err := mergeDirectories("workdir/corpus", "corpus"); err != nil {
+		log.Fatal(err)
+	}
+	if err := mergeDirectories("workdir/corpus", "additional-corpus"); err != nil {
 		log.Fatal(err)
 	}
 
@@ -267,7 +249,7 @@ func (c *FuzzitClient) runGoFuzz() error {
 	if c.currentJob.Type == "fuzzing" {
 		err = c.runGoFuzzFuzzing()
 	} else {
-		return fmt.Errorf("JQF currently only supports fuzzing")
+		return fmt.Errorf("go-fuzz currently only supports fuzzing")
 	}
 
 	return err

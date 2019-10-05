@@ -171,3 +171,22 @@ func DownloadFile(filepath string, url string) error {
 	_, err = io.Copy(out, resp.Body)
 	return err
 }
+
+func mergeDirectories(dst string, src string) error {
+	err := filepath.Walk(src, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			log.Printf("prevent panic by handling failure accessing a path %q: %v\n", path, err)
+			return err
+		}
+		if !info.IsDir() {
+			fileName := info.Name()
+			err = os.Rename(filepath.Join(src, fileName), filepath.Join(dst, fileName))
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+
+	return err
+}

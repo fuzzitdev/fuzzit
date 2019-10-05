@@ -294,7 +294,7 @@ chmod a+x fuzzit
 	return nil
 }
 
-func (c *FuzzitClient) CreateJob(jobConfig Job, files []string) (*firestore.DocumentRef, error) {
+func (c *FuzzitClient) CreateJob(jobConfig Job, additionalCorpus string, files []string) (*firestore.DocumentRef, error) {
 	err := c.refreshToken()
 	if err != nil {
 		return nil, err
@@ -341,6 +341,17 @@ func (c *FuzzitClient) CreateJob(jobConfig Job, files []string) (*firestore.Docu
 	err = c.uploadFile(fuzzerPath, storagePath, "fuzzer.tar.gz")
 	if err != nil {
 		return nil, err
+	}
+
+	if additionalCorpus != "" {
+		log.Println("Uploading additional corpus...")
+		err = c.uploadFile(
+			additionalCorpus,
+			fmt.Sprintf("orgs/%s/targets/%s/jobs/%s/additional-corpus", c.Org, jobConfig.TargetId, jobRef.ID),
+			filepath.Base(additionalCorpus))
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	log.Println("Starting job")

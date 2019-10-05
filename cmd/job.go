@@ -91,6 +91,11 @@ var jobCmd = &cobra.Command{
 			log.Fatal(err)
 		}
 
+		additionalCorpus, err := cmd.Flags().GetString("additional-corpus")
+		if err != nil {
+			log.Fatal(err)
+		}
+
 		log.Println("Creating job...")
 
 		target := args[0]
@@ -111,7 +116,7 @@ var jobCmd = &cobra.Command{
 				return
 			}
 		} else {
-			_, err = gFuzzitClient.CreateJob(newJob, args[1:])
+			_, err = gFuzzitClient.CreateJob(newJob, additionalCorpus, args[1:])
 		}
 
 		if err != nil {
@@ -138,13 +143,14 @@ func init() {
 	branch := client.GetValueFromEnv("TRAVIS_BRANCH", "CIRCLE_BRANCH", "GITHUB_REF")
 
 	jobCmd.Flags().StringVar(&newJob.Type, "type", "fuzzing", "fuzzing/regression/local-regression")
-	jobCmd.Flags().StringVar(&newJob.Engine, "engine", "libfuzzer", "libfuzzer/jqf")
+	jobCmd.Flags().StringVar(&newJob.Engine, "engine", "libfuzzer", "libfuzzer/jqf/go-fuzz")
 	jobCmd.Flags().StringVar(&newJob.CPUs, "cpus", "1", "number of cpus to use (only relevant for fuzzing job)")
 	jobCmd.Flags().StringVar(&newJob.Memory, "memory", "2048Mi", "number of cpus to use (only relevant for fuzzing job)")
 	jobCmd.Flags().MarkHidden("memory")
 	jobCmd.Flags().MarkHidden("cpus")
-	jobCmd.Flags().StringVar(&newJob.Revision, "revision", revision, "Revision tag of fuzzer (populates automatically from git,travis,circleci)")
-	jobCmd.Flags().StringVar(&newJob.Branch, "branch", branch, "Branch of the fuzzer (populates automatically from git,travis,circleci)")
+	jobCmd.Flags().StringVar(&newJob.Revision, "revision", revision, "revision tag of fuzzer (populates automatically from git,travis,circleci)")
+	jobCmd.Flags().StringVar(&newJob.Branch, "branch", branch, "branch of the fuzzer (populates automatically from git,travis,circleci)")
+	jobCmd.Flags().String("additional-corpus", "", "path to additional corpus for this job (should be a flat zip/tar.gz containing the test cases)")
 	jobCmd.Flags().StringVar(&newJob.Host, "host", "", "docker image to use when running the fuzzer. Options: stretch-llvm8/stretch-llvm9/bionic-swift51")
 	jobCmd.Flags().StringArrayVarP(&newJob.EnvironmentVariables, "environment", "e", nil,
 		"Additional environment variables for the fuzzer. For example ASAN_OPTINOS, UBSAN_OPTIONS or any other")
