@@ -142,7 +142,7 @@ func (c *FuzzitClient) RunFuzzer(job Job, jobId string, updateDB bool) error {
 		}
 		if err := c.downloadAndExtract(
 			"additional-corpus",
-			fmt.Sprintf("orgs/%s/targets/%s/jobs/%s/corpus.tar.gz", c.Org, c.currentJob.TargetId, c.jobId)); err != nil {
+			fmt.Sprintf("orgs/%s/targets/%s/jobs/%s/additional-corpus", c.Org, c.currentJob.TargetId, c.jobId)); err != nil {
 			if err.Error() == "404 Not Found" {
 				log.Println("no additional-corpus. skipping...")
 			} else {
