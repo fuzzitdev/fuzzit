@@ -180,13 +180,25 @@ func mergeDirectories(dst string, src string) error {
 		}
 		if !info.IsDir() {
 			fileName := info.Name()
-			err = os.Rename(filepath.Join(src, fileName), filepath.Join(dst, fileName))
-			if err != nil {
-				return err
+			dstPath := filepath.Join(dst, fileName)
+			if _, err := os.Stat(path); os.IsNotExist(err) {
+				err = os.Rename(filepath.Join(src, fileName), dstPath)
+				if err != nil {
+					return err
+				}
 			}
 		}
 		return nil
 	})
 
 	return err
+}
+
+func createDirIfNotExist(path string) error {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		if err := os.Mkdir(path, 0644); err != nil {
+			return err
+		}
+	}
+	return nil
 }

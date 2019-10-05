@@ -124,10 +124,8 @@ func (c *FuzzitClient) RunFuzzer(job Job, jobId string, updateDB bool) error {
 		}
 	}
 
-	if _, err := os.Stat("corpus"); os.IsNotExist(err) {
-		if err := os.Mkdir("corpus", 0644); err != nil {
-			return err
-		}
+	if err := createDirIfNotExist("corpus"); err != nil {
+		return err
 	}
 
 	if jobId != "" {
@@ -137,9 +135,6 @@ func (c *FuzzitClient) RunFuzzer(job Job, jobId string, updateDB bool) error {
 		}
 
 		log.Println("downloading additional corpus")
-		if err := os.Mkdir("additional-corpus", 0644); err != nil {
-			return err
-		}
 		if err := c.downloadAndExtract(
 			"additional-corpus",
 			fmt.Sprintf("orgs/%s/targets/%s/jobs/%s/additional-corpus", c.Org, c.currentJob.TargetId, c.jobId)); err != nil {
@@ -149,6 +144,11 @@ func (c *FuzzitClient) RunFuzzer(job Job, jobId string, updateDB bool) error {
 				return err
 			}
 		}
+
+		if err := createDirIfNotExist("additional-corpus"); err != nil {
+			return err
+		}
+
 	}
 
 	var err error
