@@ -85,6 +85,7 @@ More information can be found in our [docs](https://docs.fuzzit.dev).
 
 * RUST
 - [CraneStation/cranelift](https://github.com/CraneStation/cranelift)
+- [image-rs/image](https://github.com/image-rs/image)
 
 * C/C++ 
 - [systemd/systemd](https://github.com/systemd/systemd)
