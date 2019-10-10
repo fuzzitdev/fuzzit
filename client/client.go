@@ -46,6 +46,7 @@ type crash struct {
 	Type       string    `firestore:"type"`
 	Time       time.Time `firestore:"time,serverTimestamp"`
 	V2         bool      `firestore:"v2"`
+	LastLines  string    `firestore:"last_lines"`
 }
 
 type FuzzitClient struct {

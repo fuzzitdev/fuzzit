@@ -27,6 +27,8 @@ const (
 	AgentNoPermissionError = 22
 )
 
+var lastLines []string
+
 func appendPrefixToCmd(cmd *exec.Cmd) error {
 	stderr, err := cmd.StderrPipe()
 	if err != nil {
@@ -42,6 +44,10 @@ func appendPrefixToCmd(cmd *exec.Cmd) error {
 		for scanner.Scan() {
 			msg := scanner.Text()
 			fmt.Printf("FUZZER: %s\n", msg)
+			lastLines = append(lastLines, msg)
+			if len(lastLines) > 1000 {
+				lastLines = lastLines[500:]
+			}
 		}
 	}()
 

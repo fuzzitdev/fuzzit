@@ -122,6 +122,7 @@ func (c *FuzzitClient) uploadCrash(exitCode int) error {
 			OrgId:      c.Org,
 			ExitCode:   uint32(exitCode),
 			Type:       "crash",
+			LastLines:  strings.Join(lastLines, "\n"),
 			V2:         true,
 		})
 		if err != nil {
