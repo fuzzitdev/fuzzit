@@ -19,6 +19,7 @@ import (
 	"log"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/fuzzitdev/fuzzit/v2/client"
 	"github.com/spf13/cobra"
@@ -110,19 +111,23 @@ var jobCmd = &cobra.Command{
 		newJob.TargetId = target
 
 		if newJob.Type == "local-regression" {
+			start := time.Now()
 			err = gFuzzitClient.CreateLocalJob(newJob, args[1:])
 			if err != nil && skipIfNotExist && (err.Error() == "401 Unauthorized" || err.Error() == "fuzzer exited with 22") {
 				log.Println("Target doesn't exist yet. skipping...")
 				return
 			}
+			diff := time.Now().Sub(start)
+			log.Printf("Regression for %s took %s seconds", target, diff)
 		} else {
 			_, err = gFuzzitClient.CreateJob(newJob, additionalCorpus, args[1:])
+			log.Printf("Job created successfully")
 		}
 
 		if err != nil {
 			log.Fatal(err)
 		}
-		log.Printf("Job created successfully")
+
 	},
 }
 
