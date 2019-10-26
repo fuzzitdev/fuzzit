@@ -150,11 +150,10 @@ func (c *FuzzitClient) RunFuzzer(job Job, jobId string, updateDB bool) error {
 				return err
 			}
 		}
+	}
 
-		if err := createDirIfNotExist("additional-corpus"); err != nil {
-			return err
-		}
-
+	if err := createDirIfNotExist("additional-corpus"); err != nil {
+		return err
 	}
 
 	var err error

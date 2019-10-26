@@ -143,6 +143,7 @@ func (c *FuzzitClient) runLibFuzzerFuzzing() error {
 			"-error_exitcode=76",
 			"-max_total_time=3600",
 			"corpus",
+			"additional-corpus",
 			"seed",
 		},
 	)
@@ -245,12 +246,17 @@ func (c *FuzzitClient) runLibFuzzerRegression() error {
 	if err != nil {
 		return err
 	}
+	additionalFiles, err := listFiles("additional-corpus")
+	if err != nil {
+		return err
+	}
 	seedFiles, err = listFiles("seed")
 	if err != nil {
 		return err
 	}
 
 	regressionFiles := append(corpusFiles, seedFiles...)
+	regressionFiles = append(regressionFiles, additionalFiles...)
 	if len(regressionFiles) == 0 {
 		log.Println("no files in corpus and seed. skipping run")
 		c.transitionStatus("pass")
