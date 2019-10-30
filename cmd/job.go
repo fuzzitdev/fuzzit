@@ -50,7 +50,7 @@ var jobCmd = &cobra.Command{
 	Args:  cobra.MinimumNArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
 		if newJob.Type != "fuzzing" && newJob.Type != "regression" && newJob.Type != "local-regression" {
-			log.Fatalf("--type should be either fuzzing, regression or local-regression. Received: %s", newJob.Type)
+			log.Fatalf("--type should be either fuzzing, local-regression or regression(DEPERCATED). Received: %s", newJob.Type)
 		}
 
 		if newJob.Engine != "libfuzzer" && newJob.Engine != "jqf" && newJob.Engine != "go-fuzz" {
@@ -147,7 +147,7 @@ func init() {
 
 	branch := client.GetValueFromEnv("TRAVIS_BRANCH", "CIRCLE_BRANCH", "GITHUB_REF")
 
-	jobCmd.Flags().StringVar(&newJob.Type, "type", "fuzzing", "fuzzing/regression/local-regression")
+	jobCmd.Flags().StringVar(&newJob.Type, "type", "fuzzing", "fuzzing/local-regression")
 	jobCmd.Flags().StringVar(&newJob.Engine, "engine", "libfuzzer", "libfuzzer/jqf/go-fuzz")
 	jobCmd.Flags().StringVar(&newJob.CPUs, "cpus", "1", "number of cpus to use (only relevant for fuzzing job)")
 	jobCmd.Flags().StringVar(&newJob.Memory, "memory", "2048Mi", "number of cpus to use (only relevant for fuzzing job)")
