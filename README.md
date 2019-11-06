@@ -83,6 +83,7 @@ More information can be found in our [docs](https://docs.fuzzit.dev).
 - [pquerna/ffjson](https://github.com/pquerna/ffjson)
 - [jaegertracing/jaeger](https://github.com/jaegertracing/jaeger)
 - [caddyserver/caddy](https://github.com/caddyserver/caddy/tree/v2)
+- [tealeg/xlsx](https://github.com/tealeg/xlsx)
 
 * RUST
 - [CraneStation/cranelift](https://github.com/CraneStation/cranelift)
