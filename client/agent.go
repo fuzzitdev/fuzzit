@@ -9,6 +9,8 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"os/signal"
+	"syscall"
 )
 
 const (
@@ -99,6 +101,14 @@ func (c *FuzzitClient) RunFuzzer(job Job, jobId string, updateDB bool) error {
 	if err := c.refreshToken(); err != nil {
 		return err
 	}
+
+	channel := make(chan os.Signal)
+	signal.Notify(channel, syscall.SIGTERM)
+	go func() {
+		<-channel
+		log.Println("VM interrupted. shutting down and relaunching...")
+		os.Exit(0)
+	}()
 
 	c.currentJob = job
 	c.jobId = jobId
