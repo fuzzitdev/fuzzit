@@ -2,7 +2,6 @@
 
 [![fuzzit](https://app.fuzzit.dev/static/fuzzit-passing-green.svg)](https://app.fuzzit.dev)
 [![license](https://app.fuzzit.dev/static/license-apache-blue.svg)](https://github.com/fuzzitdev/Fuzzit/blob/master/LICENSE)
-[![Join the chat at https://slack.fuzzit.dev](https://app.fuzzit.dev/static/slack-join.svg)](https://slack.fuzzit.dev)
 
 ## Fuzzit
 [Fuzzit](https://fuzzit.dev) helps you integrate Continuous Fuzzing to your [C/C++](https://github.com/fuzzitdev/example-c),
@@ -83,10 +82,13 @@ More information can be found in our [docs](https://docs.fuzzit.dev).
 - [gomarkdown/markdown](https://github.com/gomarkdown/markdown)
 - [pquerna/ffjson](https://github.com/pquerna/ffjson)
 - [jaegertracing/jaeger](https://github.com/jaegertracing/jaeger)
+- [caddyserver/caddy](https://github.com/caddyserver/caddy/tree/v2)
+- [tealeg/xlsx](https://github.com/tealeg/xlsx)
 
 * RUST
 - [CraneStation/cranelift](https://github.com/CraneStation/cranelift)
 - [image-rs/image-png](https://github.com/image-rs/image-png)
+- [pest-parser/pest](https://github.com/pest-parser/pest)
 
 * C/C++ 
 - [systemd/systemd](https://github.com/systemd/systemd)
