@@ -357,7 +357,7 @@ func (c *FuzzitClient) CreateJob(jobConfig Job, additionalCorpus string, files [
 	log.Println("Starting job")
 	_, err = jobRef.Set(ctx, jobConfig)
 	if err != nil {
-		log.Printf("Please check that the target '%s' exists and you have sufficiant permissions",
+		log.Printf("Please check that the target '%s' exists and you have sufficient permissions",
 			jobConfig.TargetId)
 		return nil, err
 	}
