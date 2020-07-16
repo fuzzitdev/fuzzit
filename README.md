@@ -1,3 +1,5 @@
+fuzzit.dev was [acquired](https://about.gitlab.com/press/releases/2020-06-11-gitlab-acquires-peach-tech-and-fuzzit-to-expand-devsecops-offering.html) by GitLab and the standalone service will soon be deperecated. The service will be available as part of GitLab Ultimate in the near future.
+
 [![Fuzzit Logo](https://app.fuzzit.dev/static/fuzzit-logo.svg)](https://fuzzit.dev)
 
 [![fuzzit](https://app.fuzzit.dev/static/fuzzit-passing-green.svg)](https://app.fuzzit.dev)
